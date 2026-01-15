@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cage Dorée - SECURE ACCESS</title>
+    <style>
+        /* 폰트 및 기본 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Serif+KR:wght@500;700&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --gold: #b38b48;
+            --gold-light: #e6c88b;
+            --black: #050505;
+            --sys-font: 'Share Tech Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+        body {
+            background-color: var(--black);
+            color: #ccc;
+            font-family: 'Noto Serif KR', serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* CCTV 효과 */
+        #cctv-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+            pointer-events: none; z-index: 9000; opacity: 0.3;
+        }
+        .cctv-ui {
+            position: fixed; padding: 20px; color: var(--gold); font-family: var(--sys-font);
+            font-size: 0.8rem; z-index: 9001; pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+        .top-left { top: 0; left: 0; }
+        .top-right { top: 0; right: 0; }
+        .bottom-left { bottom: 0; left: 0; }
+        .rec-dot { color: red; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* [1단계] 봉투 및 암호 입력 */
+        #stage-intro {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #020202; z-index: 5000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1s;
+        }
+
+        .envelope-box {
+            width: 320px; margin-bottom: 50px; cursor: pointer;
+            transition: transform 0.3s; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+        }
+        .envelope-box:hover { transform: translateY(-5px); }
+        .envelope-box img { width: 100%; border: 1px solid #333; }
+
+        #auth-panel {
+            opacity: 0; transform: translateY(20px); transition: 0.5s;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+        }
+        #auth-panel.active { opacity: 1; transform: translateY(0); }
+
+        .pass-input {
+            background: transparent; border: none; border-bottom: 2px solid #333;
+            color: var(--gold); font-family: 'Noto Serif KR'; font-weight: 700;
+            font-size: 1.5rem; text-align: center; padding: 10px; width: 350px; outline: none;
+            transition: 0.3s;
+        }
+        .pass-input:focus { border-bottom-color: var(--gold); }
+
+        /* [홀드 버튼] */
+        .hold-btn-container {
+            position: relative; width: 280px; height: 70px; margin-top: 30px;
+        }
+        .hold-btn {
+            width: 100%; height: 100%; background: #0a0a0a; border: 1px solid #444;
+            color: #666; font-family: var(--sys-font); font-size: 1.2rem; letter-spacing: 2px;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; transition: 0.2s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .hold-btn:active { border-color: var(--gold); color: var(--gold); transform: scale(0.98); }
+        
+        .progress-fill {
+            position: absolute; left: 0; top: 0; height: 100%; width: 0%;
+            background: var(--gold); opacity: 0.3; pointer-events: none;
+        }
+        .hold-text { position: relative; z-index: 10; }
+
+        /* [2단계] 전환 효과 */
+        #stage-transition {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 4000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .access-text {
+            font-family: 'Cinzel'; font-weight: 900; font-size: 3rem; color: var(--gold);
+            letter-spacing: 5px; opacity: 0; transform: scale(0.9);
+        }
+        .access-text.reveal { animation: heavyReveal 2.5s forwards; }
+
+        @keyframes heavyReveal {
+            0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+            20% { opacity: 1; transform: scale(1.02); filter: blur(0); text-shadow: 0 0 30px var(--gold); }
+            100% { opacity: 1; transform: scale(1); text-shadow: none; }
+        }
+
+        /* [3단계] 메인 컨텐츠 */
+        #main-content {
+            display: none; opacity: 0; transition: opacity 2s;
+            height: 100vh; overflow-y: auto; padding-bottom: 100px;
+        }
+        .hero {
+            height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.5), #000), url('https://images.unsplash.com/photo-1542259681-d4cd718619bc?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            position: relative;
+        }
+        .hero h1 { font-family: 'Cinzel'; font-weight: 900; font-size: 4.5rem; color: var(--gold); margin-bottom: 10px; }
+        .hero p { font-family: var(--sys-font); color: #888; letter-spacing: 3px; }
+
+        /* 스크롤 화살표 */
+        .scroll-indicator {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            color: var(--gold); opacity: 0.7; animation: bounce 2s infinite;
+        }
+        .scroll-text { font-family: var(--sys-font); font-size: 0.7rem; letter-spacing: 2px; }
+        .arrow-down { font-size: 1.5rem; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+            40% {transform: translateX(-50%) translateY(-10px);}
+            60% {transform: translateX(-50%) translateY(-5px);}
+        }
+
+        section { max-width: 1000px; margin: 120px auto; padding: 0 40px; }
+        .sec-header { border-left: 4px solid var(--gold); padding-left: 20px; margin-bottom: 50px; }
+        .sec-title { font-family: 'Cinzel'; font-weight: 700; font-size: 2.2rem; color: var(--gold); }
+        .sec-sub { font-family: var(--sys-font); color: #666; margin-top: 5px; }
+
+        /* Redacted 효과 */
+        .redacted {
+            background: #000; color: #000; padding: 0 5px; cursor: help; border: 1px solid #333; transition: 0.3s; position: relative;
+        }
+        .redacted::after {
+            content: 'RESTRICTED'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            color: #333; font-family: var(--sys-font); font-size: 0.7rem; pointer-events: none;
+        }
+        .redacted:hover { background: transparent; color: var(--gold-light); border-color: var(--gold); }
+        .redacted:hover::after { content: ''; }
+
+        /* Floor Plan */
+        .floor-plan {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            border: 2px solid #222; padding: 20px; background: #080808;
+        }
+        .room-box {
+            height: 120px; border: 1px solid #333; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: 0.3s; cursor: crosshair; position: relative;
+        }
+        .room-box:hover { border-color: var(--gold); background: rgba(179, 139, 72, 0.05); }
+        .room-name { font-family: 'Cinzel'; font-weight: 700; color: #888; transition: 0.3s; }
+        .room-box:hover .room-name { color: var(--gold); }
+        .room-details {
+            position: absolute; bottom: 10px; font-family: var(--sys-font); font-size: 0.7rem; color: #555; opacity: 0; transition: 0.3s;
+        }
+        .room-box:hover .room-details { opacity: 1; }
+
+        /* Character Grid */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .char-card { background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
+        .char-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .char-img {
+            width: 100%; height: 350px; background-size: cover; background-position: center;
+            filter: grayscale(100%) contrast(1.2); transition: 0.5s;
+        }
+        .char-card:hover .char-img { filter: grayscale(0%); }
+        .char-info { padding: 20px; border-top: 1px solid #222; }
+        .c-alias { font-family: 'Cinzel'; font-weight: 700; font-size: 1.2rem; color: var(--gold); }
+        .c-role { font-family: var(--sys-font); font-size: 0.8rem; color: #666; margin-top: 5px; }
+
+        /* Modal */
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .dossier-paper {
+            width: 90%; max-width: 900px; height: 80vh; background: #0e0e0e;
+            border: 1px solid var(--gold); display: flex; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        .d-img { width: 40%; background-size: cover; background-position: center; border-right: 1px solid #333; filter: sepia(20%); }
+        .d-content { width: 60%; padding: 50px; overflow-y: auto; }
+        .d-stamp {
+            border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900;
+            display: inline-block; padding: 5px 15px; transform: rotate(-5deg); margin-bottom: 20px; opacity: 0.8;
+        }
+        .d-title { font-family: 'Cinzel'; font-size: 2.5rem; color: var(--gold); margin-bottom: 5px; }
+        .d-meta { font-family: var(--sys-font); color: #666; margin-bottom: 30px; }
+        .d-section { margin-bottom: 25px; }
+        .d-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; display: block; margin-bottom: 8px; }
+        .d-text { font-size: 1rem; line-height: 1.8; color: #ccc; }
+        .close-btn { float: right; font-size: 2rem; cursor: pointer; color: #444; }
+        .close-btn:hover { color: #fff; }
+
+    </style>
+</head>
+<body>
+
+    <!-- 유튜브 플레이어 (숨김) -->
+    <div id="youtube-player" style="display:none;"></div>
+
+    <!-- UI -->
+    <div id="cctv-layer"></div>
+    <div class="cctv-ui top-left"><span class="rec-dot">●</span> REC</div>
+    <div class="cctv-ui top-right">CAM-01 [LIVE]</div>
+    <div class="cctv-ui bottom-left" id="clock">00:00:00:00</div>
+
+    <!-- STAGE 1: INTRO -->
+    <div id="stage-intro">
+        <div class="envelope-box" onclick="revealInput()">
+            <!-- 봉투 이미지 -->
+            <img src="https://via.placeholder.com/320x220/111/444?text=ENCRYPTED+MAIL" alt="Envelope">
+        </div>
+
+        <div id="auth-panel">
+            <input type="text" class="pass-input" id="pass-input" placeholder="PASSPHRASE" autocomplete="off">
+            
+            <div class="hold-btn-container">
+                <div class="hold-btn" id="hold-btn">
+                    <div class="progress-fill" id="progress-fill"></div>
+                    <span class="hold-text">HOLD TO ACCESS</span>
+                </div>
+            </div>
+            <p style="font-family: var(--sys-font); color: #444; font-size: 0.8rem;">SECURE CONNECTION REQUIRED</p>
+        </div>
+    </div>
+
+    <!-- STAGE 2: TRANSITION -->
+    <div id="stage-transition">
+        <div class="access-text" id="access-text">ACCESS GRANTED</div>
+    </div>
+
+    <!-- STAGE 3: MAIN CONTENT -->
+    <div id="main-content">
+        <div class="hero">
+            <h1>La Cage Dorée</h1>
+            <p>THE GOLDEN BIRDCAGE // PRIVATE SECTOR</p>
+            
+            <!-- 스크롤 화살표 -->
+            <div class="scroll-indicator">
+                <span class="scroll-text">SCROLL</span>
+                <span class="arrow-down">↓</span>
+            </div>
+        </div>
+
+        <section>
+            <div class="sec-header">
+                <h2 class="sec-title">Facility Overview</h2>
+                <div class="sec-sub">CONFIDENTIALITY LEVEL: 1</div>
+            </div>
+            <p style="line-height: 2; font-size: 1.1rem; color: #aaa;">
+                본 시설은 상류층을 위한 <span class="redacted">비밀 BDSM 클럽</span>입니다.<br>
+                겉으로는 평범한 갤러리이나, 내부는 철저히 통제된 <span class="redacted">황금 새장</span>입니다.<br>
+                내부에서의 모든 행위는 <span class="redacted">기록되지 않으나 관찰됩니다.</span>
+            </p>
+        </section>
+
+        <section>
+            <div class="sec-header">
+                <h2 class="sec-title">Sector Map</h2>
+                <div class="sec-sub">REAL-TIME STATUS</div>
+            </div>
+            <div class="floor-plan">
+                <div class="room-box"><div class="room-name">LOUNGE</div><div class="room-details">OCCUPANCY: 12 / LUX: 40</div></div>
+                <div class="room-box"><div class="room-name">BLACK ROOM</div><div class="room-details">STATUS: <span style="color:red">OCCUPIED</span></div></div>
+                <div class="room-box"><div class="room-name">MIRROR ROOM</div><div class="room-details">STATUS: VACANT</div></div>
+                <div class="room-box"><div class="room-name">THEATER</div><div class="room-details">SHOW START: 22:00</div></div>
+                <div class="room-box"><div class="room-name">CLINIC</div><div class="room-details">DR. WHITE ON DUTY</div></div>
+                <div class="room-box"><div class="room-name">V.I.P SUITE</div><div class="room-details">ACCESS DENIED</div></div>
+            </div>
+        </section>
+
+        <section>
+            <div class="sec-header">
+                <h2 class="sec-title">Subject Database</h2>
+                <div class="sec-sub">AUTHORIZED PERSONNEL ONLY</div>
+            </div>
+            <div class="char-grid" id="char-grid"></div>
+        </section>
+
+        <footer style="text-align: center; padding: 50px; color: #333; font-family: var(--sys-font);">
+            © 2026 La Cage Dorée. System ID: 938-A2
+        </footer>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" onclick="closeModal()">
+        <div class="dossier-paper" onclick="event.stopPropagation()">
+            <div class="d-img" id="m-img"></div>
+            <div class="d-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <div class="d-stamp">TOP SECRET</div>
+                <h2 class="d-title" id="m-alias">ALIAS</h2>
+                <div class="d-meta" id="m-meta">Real Name | Age | Role</div>
+                <div class="d-section"><span class="d-label">PERSONALITY</span><p class="d-text" id="m-pers"></p></div>
+                <div class="d-section"><span class="d-label">BACKGROUND</span><p class="d-text" id="m-bg"></p></div>
+                <div class="d-section"><span class="d-label">NOTES</span><p class="d-text" style="color:#888; font-style:italic;" id="m-note"></p></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // ★★★ 여기에 유튜브 영상 ID를 넣으세요! ★★★
+        const YOUTUBE_ID = "bG_UV0owkkE"; 
+        // =========================================================
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let chargeOsc1 = null; 
+        let chargeOsc2 = null; 
+        let chargeGain = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // [사운드 1] 게이지 충전음 (낮은 진동)
+        function startChargeSound() {
+            if (!audioCtx) initAudio();
+            if (chargeOsc1) return; 
+
+            chargeGain = audioCtx.createGain();
+            chargeGain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            // 저음 (40Hz -> 80Hz)
+            chargeOsc1 = audioCtx.createOscillator();
+            chargeOsc1.type = 'sine'; 
+            chargeOsc1.frequency.setValueAtTime(40, now);
+            chargeOsc1.frequency.linearRampToValueAtTime(80, now + 2.0);
+            chargeOsc1.connect(chargeGain);
+
+            // 질감 (Triangle 60Hz -> 100Hz)
+            chargeOsc2 = audioCtx.createOscillator();
+            chargeOsc2.type = 'triangle';
+            chargeOsc2.frequency.setValueAtTime(60, now);
+            chargeOsc2.frequency.linearRampToValueAtTime(100, now + 2.0);
+            chargeOsc2.connect(chargeGain);
+
+            // 볼륨
+            chargeGain.gain.setValueAtTime(0, now);
+            chargeGain.gain.linearRampToValueAtTime(0.3, now + 2.0); 
+
+            chargeOsc1.start(now);
+            chargeOsc2.start(now);
+        }
+
+        // [사운드 2] 중단
+        function stopChargeSound() {
+            if (chargeOsc1) {
+                const now = audioCtx.currentTime;
+                chargeGain.gain.cancelScheduledValues(now);
+                chargeGain.gain.setValueAtTime(chargeGain.gain.value, now);
+                chargeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                chargeOsc1.stop(now + 0.05);
+                chargeOsc2.stop(now + 0.05);
+                chargeOsc1 = null; chargeOsc2 = null; chargeGain = null;
+            }
+        }
+
+        // [사운드 3] 승인 (쿵!)
+        function playUnlockSound() {
+            if (!audioCtx) initAudio();
+            const now = audioCtx.currentTime;
+
+            // 묵직한 타격음
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
+            gain.gain.setValueAtTime(1.0, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.5);
+
+            // 철컥 소리
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'square';
+            osc2.frequency.setValueAtTime(50, now);
+            osc2.frequency.exponentialRampToValueAtTime(0.01, now + 0.2);
+            gain2.gain.setValueAtTime(0.5, now);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start(now); osc2.stop(now + 0.2);
+        }
+
+        // [사운드 4] 기타 효과음
+        function playSfx(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+
+            if (type === 'hover') { 
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(40, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            }
+            osc.connect(gain); gain.connect(audioCtx.destination);
+        }
+
+        // --- INTERACTION ---
+        function revealInput() {
+            initAudio();
+            document.querySelector('.envelope-box').style.opacity = '0';
+            document.querySelector('.envelope-box').style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                document.querySelector('.envelope-box').style.display = 'none';
+                document.getElementById('auth-panel').classList.add('active');
+            }, 500);
+        }
+
+        // --- HOLD LOGIC ---
+        const holdBtn = document.getElementById('hold-btn');
+        const progressFill = document.getElementById('progress-fill');
+        let holdTimer;
+        let isHolding = false;
+
+        function startHold(e) {
+            if (e.button && e.button !== 0) return;
+            const pass = document.getElementById('pass-input').value.replace(/\s/g, '');
+            if(pass !== '욕망은허락된자만이누릴수있다') {
+                document.getElementById('pass-input').style.borderBottomColor = '#8b0000';
+                return;
+            }
+
+            isHolding = true;
+            startChargeSound();
+            progressFill.style.transition = 'width 2.0s linear';
+            progressFill.style.width = '100%';
+
+            holdTimer = setTimeout(() => {
+                if (isHolding) {
+                    stopChargeSound();
+                    playUnlockSound(); // 쾅!
+                    grantAccess();
+                    isHolding = false;
+                }
+            }, 2000);
+        }
+
+        function endHold() {
+            if (!isHolding) return;
+            isHolding = false;
+            clearTimeout(holdTimer);
+            stopChargeSound();
+            progressFill.style.transition = 'width 0.1s ease-out';
+            progressFill.style.width = '0%';
+        }
+
+        holdBtn.addEventListener('mousedown', startHold);
+        window.addEventListener('mouseup', endHold);
+        holdBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(e); });
+        window.addEventListener('touchend', endHold);
+
+        // --- TRANSITION ---
+        function grantAccess() {
+            document.getElementById('stage-intro').style.display = 'none';
+            const trans = document.getElementById('stage-transition');
+            trans.style.display = 'flex';
+            
+            const txt = document.getElementById('access-text');
+            txt.classList.add('reveal');
+
+            // ★ 음악 재생 (여기서 실행됨) ★
+            if(player && player.playVideo) { 
+                player.playVideo(); 
+                player.setVolume(70); 
+            }
+
+            setTimeout(() => {
+                trans.style.opacity = 0;
+                trans.style.transition = 'opacity 1.5s ease';
+                setTimeout(() => {
+                    trans.style.display = 'none';
+                    const main = document.getElementById('main-content');
+                    main.style.display = 'block';
+                    setTimeout(() => main.style.opacity = 1, 100);
+                }, 1500);
+            }, 3000);
+        }
+
+        // --- DATA ---
+        document.querySelectorAll('.redacted').forEach(el => {
+            el.addEventListener('mouseenter', () => playSfx('hover'));
+        });
+
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
+        }, 1000);
+
+        const characters = [
+            { id: 1, alias: "OBSIDIAN", name: "차도윤", role: "DOMINANT", img: "https://via.placeholder.com/400x600/111/555?text=Obsidian", 
+              meta: "차도윤 | 28세 | CL그룹 후계자", 
+              pers: "고급스러움과 냉혹함. 말수가 적고 눈빛과 행동으로 압도함.",
+              bg: "재벌 가문 출신. <span class='redacted'>가장 위험한 도미넌트</span>로 분류됨.", note: "통제광 기질." },
+            { id: 2, alias: "AURUM", name: "서율", role: "DOMINANT (SOFT)", img: "https://via.placeholder.com/400x600/222/555?text=Aurum", 
+              meta: "서율 | 27세 | 심리상담사", 
+              pers: "다정하고 상냥하지만 심리를 장악하는 데 능함.",
+              bg: "초보자를 다루는 데 특화됨. 내면 깊은 곳엔 <span class='redacted'>강한 독점욕</span>이 숨겨져 있음.", note: "경계 대상." },
+            { id: 3, alias: "ECHO", name: "류이안", role: "SUBMISSIVE", img: "https://via.placeholder.com/400x600/151515/555?text=Echo", 
+              meta: "류이안 | 26세 | 배우", 
+              pers: "무대 위에선 빛나지만 클럽에선 복종을 갈구함.",
+              bg: "감정이 과열되면 <span class='redacted'>위험한 집착</span>으로 돌변할 수 있음.", note: "애정 결핍." },
+            { id: 4, alias: "GLASS", name: "노엘", role: "SWITCH", img: "https://via.placeholder.com/400x600/1a1a1a/555?text=Glass", 
+              meta: "노엘 | 29세 | 행동 심리학자", 
+              pers: "장난기 많지만 거리감 유지. 영어를 섞어 씀.",
+              bg: "유저를 연구 대상으로 여김. <span class='redacted'>실험적인 플레이</span>를 즐김.", note: "예측 불가." },
+            { id: 5, alias: "RENAULT", name: "르노", role: "OWNER", img: "https://via.placeholder.com/400x600/0d0d0d/555?text=Renault", 
+              meta: "르노 | 미상 | 클럽 오너", 
+              pers: "조용하지만 사람을 꿰뚫는 통찰력.",
+              bg: "클럽의 절대 권력자. 과거 신원 불명.", note: "접근 주의." },
+            { id: 6, alias: "WHITE MISTRESS", name: "진보라", role: "DOMINA", img: "https://via.placeholder.com/400x600/202020/555?text=White", 
+              meta: "진보라 | 29세 | 큐레이터", 
+              pers: "냉정하고 도도함. 사람을 미술품처럼 감상.",
+              bg: "클럽 규칙 위반자를 즉시 제재함. 과거 <span class='redacted'>차도윤의 연인</span>.", note: "규칙 엄수." }
+        ];
+
+        const grid = document.getElementById('char-grid');
+        characters.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'char-card';
+            div.onclick = () => openModal(c);
+            div.innerHTML = `
+                <div class="char-img" style="background-image: url('${c.img}')"></div>
+                <div class="char-info"><div class="c-alias">${c.alias}</div><div class="c-role">${c.role}</div></div>
+            `;
+            grid.appendChild(div);
+        });
+
+        const modal = document.getElementById('modal-overlay');
+        function openModal(c) {
+            document.getElementById('m-img').style.backgroundImage = `url('${c.img}')`;
+            document.getElementById('m-alias').innerText = c.alias;
+            document.getElementById('m-meta').innerText = c.meta;
+            document.getElementById('m-pers').innerText = c.pers;
+            document.getElementById('m-bg').innerHTML = c.bg;
+            document.getElementById('m-note').innerText = c.note;
+            modal.style.display = 'flex';
+            document.querySelectorAll('.dossier-paper .redacted').forEach(el => {
+                el.addEventListener('mouseenter', () => playSfx('hover'));
+            });
+        }
+        function closeModal() { modal.style.display = 'none'; }
+
+        // YouTube API
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0', width: '0', 
+                videoId: YOUTUBE_ID, // ★ 위에서 설정한 ID 사용
+                playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': YOUTUBE_ID }
+            });
+        }
+    </script>
+</body>
+</html>
