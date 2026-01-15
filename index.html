@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Cage Dorée - MOBILE ACCESS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Cage Dorée - BIOMETRIC ACCESS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
@@ -16,7 +16,7 @@
             --sys-font: 'Share Tech Mono', monospace;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
         body {
             background-color: var(--black);
@@ -27,19 +27,21 @@
         }
 
         /* 스크롤바 */
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-        /* ================= STAGE 1: INTRO ================= */
+        /* ================= STAGE 1: INTRO (SCANNER) ================= */
         #stage-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at center, #111 0%, #000 90%);
             z-index: 5000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s; padding: 20px;
+            transition: opacity 1s;
         }
 
+        /* 배경 그리드 효과 */
         #stage-intro::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(255, 0, 0, 0.02), rgba(255, 0, 0, 0.06));
@@ -47,11 +49,11 @@
         }
 
         .intro-status {
-            font-family: var(--sys-font); color: var(--gold); font-size: 0.9rem; margin-bottom: 20px;
-            letter-spacing: 2px; opacity: 0.8; text-align: center;
+            font-family: var(--sys-font); color: var(--gold); font-size: 1rem; margin-bottom: 30px;
+            letter-spacing: 3px; opacity: 0.8; text-shadow: 0 0 10px rgba(179, 139, 72, 0.5);
         }
 
-        .envelope-wrapper { position: relative; width: 90%; max-width: 500px; cursor: pointer; }
+        .envelope-wrapper { position: relative; width: 650px; max-width: 90vw; cursor: pointer; }
 
         .envelope-box {
             width: 100%; display: block;
@@ -72,9 +74,8 @@
             margin-top: 30px; font-family: var(--sys-font); color: #555; font-size: 0.8rem;
             animation: pulseText 2s infinite;
         }
-
         @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
         .scanning .envelope-box { animation: shake 0.5s linear infinite; }
         .scanning .scan-line { opacity: 1; animation: scanDown 1.5s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
@@ -87,48 +88,52 @@
             100% { transform: scale(0); filter: brightness(5); opacity: 0; }
         }
 
-        /* 패널 (모바일 대응) */
+        /* 패널 */
         #auth-panel {
             opacity: 0; display: none;
-            flex-direction: column; align-items: center; gap: 20px;
+            flex-direction: column; align-items: center; gap: 25px;
             background: var(--panel-bg);
-            padding: 40px 20px; border: 1px solid var(--gold);
+            padding: 50px 40px; border: 1px solid var(--gold);
             box-shadow: 0 0 80px rgba(0,0,0,0.9);
             position: relative; margin-top: -50px; 
             animation: panelAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            width: 90%; max-width: 400px;
+            width: 400px; max-width: 95vw;
         }
         @keyframes panelAppear { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .panel-title { font-family: 'Cinzel'; color: var(--gold); font-size: 1.1rem; margin-bottom: 5px; letter-spacing: 1px; text-align: center; }
+        .panel-title { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-bottom: 5px; letter-spacing: 2px; }
 
         .pass-input {
             background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid #333;
             color: var(--gold); font-family: 'Noto Serif KR'; font-weight: 700;
-            font-size: 1.2rem; text-align: center; padding: 10px; width: 100%; outline: none;
-            transition: 0.3s; border-radius: 0;
+            font-size: 1.3rem; text-align: center; padding: 10px; width: 100%; outline: none;
+            transition: 0.3s;
         }
         .pass-input:focus { border-bottom-color: var(--gold); }
+        .pass-input::placeholder { color: #333; font-weight: 300; font-size: 0.9rem; }
 
-        /* 지문 인식 스캐너 */
+        /* ★ 지문 인식 스캐너 스타일 ★ */
         .fingerprint-container {
-            position: relative; width: 90px; height: 90px;
+            position: relative; width: 100px; height: 100px;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; margin-top: 10px;
             border-radius: 50%; border: 1px solid #222;
             transition: 0.3s; background: radial-gradient(circle, #111 0%, #000 70%);
-            -webkit-tap-highlight-color: transparent; /* 모바일 탭 박스 제거 */
         }
-        .fingerprint-container:active { transform: scale(0.95); border-color: var(--gold); }
+        .fingerprint-container:active { transform: scale(0.95); border-color: var(--gold); box-shadow: 0 0 20px rgba(179, 139, 72, 0.2); }
         
-        .fingerprint-icon { width: 50px; height: 50px; fill: #444; transition: 0.3s; }
+        .fingerprint-icon {
+            width: 60px; height: 60px; fill: #444; transition: 0.3s;
+        }
         
+        /* 스캔 중 레이저 바 */
         .scan-beam {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px;
             background: var(--gold); box-shadow: 0 0 10px var(--gold);
             opacity: 0; pointer-events: none;
         }
         
+        /* 스캔 애니메이션 */
         .fingerprint-container.scanning .fingerprint-icon { fill: #665c4a; }
         .fingerprint-container.scanning .scan-beam { opacity: 1; animation: beamScan 1.5s infinite linear; }
         .fingerprint-container.success { border-color: var(--gold); box-shadow: 0 0 30px var(--gold); }
@@ -137,19 +142,19 @@
         @keyframes beamScan { 0% { top: 10%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
         @keyframes pulseGold { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        .scan-msg { font-family: var(--sys-font); font-size: 0.7rem; color: #555; margin-top: -10px; }
+        .scan-msg { font-family: var(--sys-font); font-size: 0.75rem; color: #555; margin-top: -10px; }
 
-        /* ================= TRANSITION & MAIN ================= */
+        /* ================= STAGE 2 & 3: TRANSITION & MAIN ================= */
         #stage-transition {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 4000; display: none;
-            flex-direction: column; justify-content: center; align-items: center; padding: 20px;
+            flex-direction: column; justify-content: center; align-items: center;
         }
         .access-text {
-            font-family: 'Noto Serif KR'; font-weight: 700; font-size: 2rem; color: var(--gold);
+            font-family: 'Noto Serif KR'; font-weight: 700; font-size: 2.5rem; color: var(--gold);
             text-align: center; line-height: 1.4; opacity: 0; transform: scale(0.9);
         }
-        .access-text span { display: block; font-size: 1rem; font-family: var(--sys-font); color: #666; margin-top: 10px; }
+        .access-text span { display: block; font-size: 1.2rem; font-family: var(--sys-font); color: #666; margin-top: 10px; }
         .access-text.reveal { animation: heavyReveal 3s forwards; }
         @keyframes heavyReveal {
             0% { opacity: 0; transform: scale(0.9); filter: blur(20px); }
@@ -159,169 +164,199 @@
 
         #main-content {
             display: none; opacity: 0; transition: opacity 2s;
-            height: 100vh; overflow-y: auto; padding-bottom: 80px;
+            height: 100vh; overflow-y: auto; padding-bottom: 100px;
             position: relative;
         }
 
-        /* HUD */
         #system-hud {
             position: fixed; top: 0; left: 0; width: 100%; height: 50px;
             background: rgba(5, 5, 5, 0.9); border-bottom: 1px solid #333;
             z-index: 3000; display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; font-family: var(--sys-font); color: #666; font-size: 0.75rem;
+            padding: 0 20px; font-family: var(--sys-font); color: #666; font-size: 0.85rem;
             backdrop-filter: blur(5px);
         }
-        .hud-left { display: flex; gap: 15px; align-items: center; }
-        .hud-right { display: flex; gap: 15px; align-items: center; }
-        .hud-item { display: flex; align-items: center; gap: 5px; }
+        .hud-left, .hud-right { display: flex; gap: 20px; align-items: center; }
+        .hud-item { display: flex; align-items: center; gap: 8px; }
         .hud-label { color: #444; }
         .hud-value { color: var(--gold); font-weight: bold; }
-        .live-dot { width: 6px; height: 6px; background: red; border-radius: 50%; animation: blinkSlow 2.5s infinite ease-in-out; }
-        @keyframes blinkSlow { 0% { opacity: 1; box-shadow: 0 0 5px red; } 50% { opacity: 0.3; } 100% { opacity: 1; box-shadow: 0 0 5px red; } }
-        .sanity-bar { width: 60px; height: 5px; background: #222; border: 1px solid #444; position: relative; }
+        .live-dot { 
+            width: 8px; height: 8px; background: red; border-radius: 50%; 
+            animation: blinkSlow 2.5s infinite ease-in-out; 
+        }
+        @keyframes blinkSlow { 
+            0% { opacity: 1; box-shadow: 0 0 5px red; } 
+            50% { opacity: 0.3; box-shadow: none; } 
+            100% { opacity: 1; box-shadow: 0 0 5px red; } 
+        }
+        .sanity-bar { width: 80px; height: 6px; background: #222; border: 1px solid #444; position: relative; }
         .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
 
-        /* 로그: 모바일에서는 숨김 (화면 가림 방지) */
         #system-log {
-            position: fixed; bottom: 10px; right: 10px; width: 250px; height: 100px;
+            position: fixed; bottom: 20px; right: 20px; width: 300px; height: 150px;
             background: rgba(0,0,0,0.8); border: 1px solid #333;
-            z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.6rem;
+            z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.7rem;
             color: #555; overflow: hidden; pointer-events: none;
             display: flex; flex-direction: column; justify-content: flex-end;
         }
         .log-line { margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-line:last-child { color: var(--gold); animation: flash 0.5s; }
 
-        /* HERO */
         .hero {
             height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
             background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000), url('https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc3.jpeg');
             background-size: cover; background-position: center; background-attachment: fixed;
-            position: relative; padding: 20px; text-align: center;
+            position: relative;
         }
 
         .hero-slogan { 
-            font-family: 'Noto Serif KR', serif; font-size: 1rem; font-weight: 500; 
-            letter-spacing: 4px; color: var(--gold); margin-bottom: 15px; 
-            text-shadow: -1px -1px 0 #000, 1px 1px 0 #000, 0 0 20px rgba(0,0,0,0.9);
-            background: rgba(0, 0, 0, 0.6); padding: 8px 15px; border-radius: 4px;
+            font-family: 'Noto Serif KR', serif; font-size: 1.2rem; font-weight: 500; 
+            letter-spacing: 6px; color: var(--gold); margin-bottom: 15px; 
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 20px rgba(0,0,0,0.9);
+            background: rgba(0, 0, 0, 0.6); padding: 8px 20px; border-radius: 4px;
             backdrop-filter: blur(2px); border: 1px solid rgba(179, 139, 72, 0.4);
-            white-space: nowrap; /* 줄바꿈 방지 */
-            max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
         }
         .hero h1 { 
-            font-family: 'Cinzel', serif; font-weight: 900; font-size: 3.5rem; /* 모바일 사이즈 조정 */
-            color: var(--gold); margin: 0; line-height: 1.1; text-shadow: 0 10px 50px #000; 
+            font-family: 'Cinzel', serif; font-weight: 900; font-size: 6rem; 
+            color: var(--gold); margin: 0; line-height: 1; text-shadow: 0 10px 50px #000; 
         }
         .hero-sub { 
-            font-family: var(--sys-font); color: #888; font-size: 0.8rem; 
-            margin-top: 20px; letter-spacing: 2px;
+            font-family: var(--sys-font); color: #888; font-size: 0.9rem; 
+            margin-top: 20px; letter-spacing: 3px;
         }
 
         .scroll-down {
-            position: absolute; bottom: 30px; color: var(--gold); 
+            position: absolute; bottom: 40px; color: var(--gold); 
             display: flex; flex-direction: column; align-items: center; gap: 5px; 
             animation: flashBounce 2s infinite ease-in-out; cursor: pointer; z-index: 20;
         }
-        .scroll-down span:last-child { font-size: 1.8rem; text-shadow: 0 0 10px var(--gold); }
+        .scroll-down span:last-child { font-size: 2rem; text-shadow: 0 0 10px var(--gold); }
         @keyframes flashBounce { 
             0%, 100% { transform: translateY(0); opacity: 0.6; text-shadow: 0 0 5px #000; } 
             50% { transform: translateY(15px); opacity: 1; text-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold-light); } 
         }
 
-        /* CONTENT */
-        section { max-width: 1200px; margin: 100px auto; padding: 0 20px; }
-        .sec-header { text-align: center; margin-bottom: 50px; }
-        .sec-title { font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); margin-bottom: 10px; }
-        .sec-desc { color: #888; font-size: 0.9rem; line-height: 1.6; word-break: keep-all; }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .hero-slogan { font-size: 0.9rem; letter-spacing: 3px; }
+            #system-hud { padding: 0 10px; font-size: 0.7rem; }
+            .hud-right { display: none; } 
+        }
 
-        /* 정보 그리드: 모바일은 1열 */
-        .info-grid { display: grid; grid-template-columns: 1fr; gap: 30px; align-items: center; }
-        .info-text h3 { color: var(--gold); font-family: 'Cinzel'; font-size: 1.3rem; margin-bottom: 15px; border-left: 3px solid var(--gold); padding-left: 10px; }
-        .info-text p { color: #ccc; line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; }
-        .info-img { width: 100%; height: 250px; background: #111; border: 1px solid #333; object-fit: cover; filter: grayscale(50%); transition: 0.5s; cursor: pointer;}
-        
-        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .room-card { height: 200px; position: relative; border: 1px solid #333; overflow: hidden; cursor: pointer; }
-        .room-bg { width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.5s; filter: grayscale(100%) brightness(0.5); }
+        section { max-width: 1200px; margin: 150px auto; padding: 0 40px; }
+        .sec-header { text-align: center; margin-bottom: 80px; }
+        .sec-title { font-family: 'Cinzel'; font-size: 3rem; color: var(--gold); margin-bottom: 15px; }
+        .sec-desc { color: #888; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .info-text h3 { color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 20px; border-left: 3px solid var(--gold); padding-left: 15px; }
+        .info-text p { color: #ccc; line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        .info-text li { margin-bottom: 10px; list-style: none; color: #aaa; }
+        .info-text li::before { content: '◈'; color: var(--gold); margin-right: 10px; }
+        .info-img { width: 100%; height: 400px; background: #111; border: 1px solid #333; object-fit: cover; filter: grayscale(50%); transition: 0.5s; cursor: pointer;}
+        .info-img:hover { filter: grayscale(0%); border-color: var(--gold); }
+
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .room-card {
+            height: 250px; position: relative; border: 1px solid #333; overflow: hidden; cursor: pointer; group;
+        }
+        .room-bg {
+            width: 100%; height: 100%; background-size: cover; background-position: center;
+            transition: transform 0.5s, filter 0.5s; filter: grayscale(100%) brightness(0.5);
+        }
         .room-card:hover .room-bg { transform: scale(1.1); filter: grayscale(0%) brightness(0.8); }
-        .room-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: linear-gradient(to top, #000, transparent); }
-        .room-name { font-family: 'Cinzel'; font-size: 1.2rem; color: #fff; }
+        .room-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to top, #000, transparent);
+        }
+        .room-name { font-family: 'Cinzel'; font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
+        .room-meta { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; }
 
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .char-card { background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .char-img { width: 100%; height: 350px; background-size: cover; background-position: top center; filter: grayscale(100%); transition: 0.5s; }
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .char-card {
+            background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s;
+        }
+        .char-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(179, 139, 72, 0.1); }
+        .char-img {
+            width: 100%; height: 400px; background-size: cover; background-position: top center;
+            filter: grayscale(100%); transition: 0.5s;
+        }
         .char-card:hover .char-img { filter: grayscale(0%); }
+        .char-info { padding: 20px; text-align: center; border-top: 1px solid #222; }
+        .c-alias { font-family: 'Cinzel'; font-size: 1.5rem; color: #fff; }
+        .c-role { color: var(--gold); font-family: var(--sys-font); margin-top: 5px; display: block; }
 
-        /* ★ 모달 반응형 수정 ★ */
+        /* 모달 스타일 */
         #modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 10000; display: none;
-            justify-content: center; align-items: center; padding: 10px;
+            justify-content: center; align-items: center;
         }
         .modal-box {
-            width: 100%; max-width: 900px; height: 90vh; background: #0e0e0e;
-            border: 1px solid var(--gold); display: flex; 
-            flex-direction: column; /* 모바일 기본: 세로 배치 */
-            box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative;
-            animation: modalOpen 0.3s ease-out;
+            width: 90%; max-width: 1000px; height: 85vh; background: #0e0e0e;
+            border: 1px solid var(--gold); display: flex; box-shadow: 0 0 100px rgba(0,0,0,0.8);
+            position: relative; animation: modalOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        /* PC 화면 (가로 769px 이상)일 때만 가로 배치 */
-        @media (min-width: 769px) {
-            .modal-box { flex-direction: row; height: 80vh; }
-            .modal-left { width: 45%; height: 100%; }
-            .modal-right { width: 55%; height: 100%; }
-            .hero-slogan { font-size: 1.2rem; }
-        }
+        @keyframes modalOpen { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .modal-left { 
-            width: 100%; height: 40%; /* 모바일: 이미지 상단 40% */
-            border-bottom: 1px solid #333; position: relative; overflow: hidden; background: #000; 
-        }
+        .modal-left { width: 45%; border-right: 1px solid #333; position: relative; overflow: hidden; background: #000; }
         
+        /* ★ 다시 cover로 복구 (디자인 유지) + 커서 추가 ★ */
         .modal-main-img { 
             width: 100%; height: 100%; 
-            background-size: cover; background-position: top center;
-            transition: 0.3s; cursor: zoom-in;
+            background-size: cover; /* 꽉 차게 */
+            background-position: top center;
+            transition: 0.3s; cursor: zoom-in; /* 클릭 유도 커서 */
         }
+        .modal-main-img:hover { filter: brightness(1.1); transform: scale(1.02); }
 
-        .modal-right { 
-            width: 100%; height: 60%; /* 모바일: 텍스트 하단 60% */
-            padding: 30px 20px; overflow-y: auto; display: flex; flex-direction: column; 
+        .modal-right { width: 55%; padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #555; cursor: pointer; z-index: 10; }
+        
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;
         }
-        
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 2rem; color: #fff; cursor: pointer; z-index: 20; text-shadow: 0 0 5px #000; }
-        
-        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; }
-        .gallery-thumb { height: 60px; background-size: cover; background-position: center; border: 1px solid #333; filter: grayscale(100%); }
+        .gallery-thumb {
+            height: 80px; background-size: cover; background-position: center; cursor: pointer;
+            border: 1px solid #333; filter: grayscale(100%); transition: 0.2s;
+        }
+        .gallery-thumb:hover { filter: grayscale(0%); border-color: var(--gold); }
 
-        .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; }
-        .m-title { font-family: 'Cinzel'; font-size: 2rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
-        .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 20px; font-size: 0.8rem; }
-        .m-section { margin-bottom: 20px; }
-        .m-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.7rem; display: block; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 3px; }
-        .m-text { font-size: 0.95rem; line-height: 1.6; color: #ccc; white-space: pre-line; word-break: keep-all; }
+        .m-stamp { 
+            border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900;
+            display: inline-block; padding: 5px 15px; transform: rotate(-2deg); margin-bottom: 20px; width: fit-content;
+        }
+        .m-title { font-family: 'Cinzel'; font-size: 3rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
+        .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 30px; font-size: 0.9rem; }
+        .m-section { margin-bottom: 30px; }
+        .m-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; display: block; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .m-text { font-size: 1.05rem; line-height: 1.8; color: #ccc; white-space: pre-line; }
 
-        .redacted { background: #000; color: #000; padding: 0 3px; border: 1px solid #333; }
-        .redacted::after { content: 'RESTRICTED'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: #333; font-size: 0.5rem; }
+        .redacted {
+            background: #000; color: #000; padding: 0 5px; cursor: help; border: 1px solid #333; transition: 0.3s; position: relative;
+        }
+        .redacted::after {
+            content: 'RESTRICTED'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            color: #333; font-family: var(--sys-font); font-size: 0.6rem; pointer-events: none;
+        }
+        .redacted:hover { background: transparent; color: var(--gold-light); border-color: var(--gold); }
+        .redacted:hover::after { content: ''; }
 
-        /* 라이트박스 */
+        /* ★ 라이트박스 (전체화면 이미지 보기) ★ */
         #lightbox-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,1); z-index: 11000; display: none;
+            background: rgba(0,0,0,0.95); z-index: 11000; display: none;
             justify-content: center; align-items: center; cursor: zoom-out;
+            animation: fadeIn 0.3s;
         }
-        #lightbox-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        footer { text-align: center; padding: 50px 0; color: #444; font-family: var(--sys-font); font-size: 0.7rem; border-top: 1px solid #222; }
-
-        /* 모바일 전용 숨김/조정 */
-        @media (max-width: 768px) {
-            .hud-right { display: none; } /* HUD 오른쪽 숨김 */
-            #system-log { display: none; } /* 로그 숨김 (화면 가림) */
-            .hero-slogan { font-size: 0.8rem; letter-spacing: 2px; }
+        #lightbox-img {
+            max-width: 95%; max-height: 95%; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            border: 1px solid #333; object-fit: contain;
         }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+        footer { text-align: center; padding: 80px 0; color: #444; font-family: var(--sys-font); font-size: 0.8rem; border-top: 1px solid #222; }
 
     </style>
 </head>
@@ -329,20 +364,24 @@
 
     <div id="youtube-player" style="display:none;"></div>
 
+    <!-- STAGE 1: INTRO -->
     <div id="stage-intro">
         <div class="intro-status" id="intro-status">ENCRYPTED SIGNAL DETECTED</div>
+        
         <div class="envelope-wrapper" id="envelope-wrapper" onclick="processEnvelope()">
             <div class="scan-line"></div>
             <div class="envelope-box">
                 <img src="https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/Generated%20Image%20January%2015%2C%202026%20-%209_30PM-Photoroom.png" alt="Invitation">
             </div>
         </div>
+
         <div class="intro-hint" id="intro-hint">TOUCH TO DECRYPT</div>
 
         <div id="auth-panel">
             <div class="panel-title">IDENTITY VERIFICATION</div>
             <input type="text" class="pass-input" id="pass-input" placeholder="CODE NAME" autocomplete="off" maxlength="12">
             
+            <!-- ★ 지문 인식 버튼 ★ -->
             <div class="fingerprint-container" id="fp-scanner">
                 <div class="scan-beam"></div>
                 <svg class="fingerprint-icon" viewBox="0 0 24 24">
@@ -355,19 +394,23 @@
         </div>
     </div>
 
+    <!-- STAGE 2: TRANSITION -->
     <div id="stage-transition">
         <div class="access-text" id="access-text"></div>
     </div>
 
+    <!-- STAGE 3: MAIN CONTENT -->
     <div id="main-content">
         <div id="system-hud">
             <div class="hud-left">
-                <div class="hud-item"><span class="live-dot"></span> <span style="color:#8b0000; font-weight:bold;">LIVE</span></div>
+                <div class="hud-item"><span class="live-dot"></span> <span style="color:#8b0000; font-weight:bold;">LIVE MONITORING</span></div>
                 <div class="hud-item"><span class="hud-label">USER:</span> <span class="hud-value" id="hud-user">UNKNOWN</span></div>
+                <div class="hud-item"><span class="hud-label">RANK:</span> <span class="hud-value">GUEST</span></div>
             </div>
             <div class="hud-right">
                 <div class="hud-item"><span class="hud-label">SANITY:</span> <div class="sanity-bar"><div class="sanity-fill"></div></div></div>
-                <div class="hud-item" id="clock">00:00</div>
+                <div class="hud-item"><span class="hud-label">BPM:</span> <span class="hud-value" id="hud-bpm">82</span></div>
+                <div class="hud-item" id="clock">00:00:00</div>
             </div>
         </div>
 
@@ -433,10 +476,13 @@
         </footer>
     </div>
 
+    <!-- 통합 모달 -->
     <div id="modal-overlay" onclick="closeModal()">
         <div class="modal-box" onclick="event.stopPropagation()">
             <span class="close-btn" onclick="closeModal()">&times;</span>
+            <!-- 모달 왼쪽 이미지 영역 -->
             <div class="modal-left">
+                <!-- 이미지를 클릭하면 라이트박스 열림 -->
                 <div class="modal-main-img" id="m-img" onclick="openLightboxFromModal()"></div>
             </div>
             <div class="modal-right">
@@ -444,11 +490,13 @@
                 <h2 class="m-title" id="m-title">TITLE</h2>
                 <div class="m-sub" id="m-sub">Subtitle</div>
                 <div id="m-content-area"></div>
+                <!-- 갤러리 영역 -->
                 <div class="gallery-grid" id="m-gallery"></div>
             </div>
         </div>
     </div>
 
+    <!-- ★ 라이트박스 오버레이 (전체화면 이미지) ★ -->
     <div id="lightbox-overlay" onclick="closeLightbox()">
         <img id="lightbox-img" src="" alt="Full View">
     </div>
@@ -456,7 +504,7 @@
     <script>
         const YOUTUBE_ID = "bG_UV0owkkE"; 
         let currentUser = "GUEST"; 
-        let currentModalImage = "";
+        let currentModalImage = ""; // 현재 모달에 떠있는 이미지 주소 저장
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
@@ -641,6 +689,7 @@
         const mGallery = document.getElementById('m-gallery');
         const mStamp = document.getElementById('m-stamp');
 
+        // ★ 모달 이미지 설정 (전역 변수에 현재 이미지 저장) ★
         function setModalImage(src) {
             currentModalImage = src;
             mImg.style.backgroundImage = `url('${src}')`;
@@ -676,7 +725,12 @@
                     const thumb = document.createElement('div');
                     thumb.className = 'gallery-thumb';
                     thumb.style.backgroundImage = `url('${src}')`;
-                    thumb.onclick = () => { setModalImage(src); };
+                    // 썸네일 클릭 시 모달 이미지 변경 + 전역 변수 업데이트
+                    thumb.onclick = () => { 
+                        setModalImage(src);
+                        // 바로 라이트박스를 띄우고 싶다면 아래 주석 해제
+                        // openLightbox(src); 
+                    };
                     mGallery.appendChild(thumb);
                 });
             }
@@ -686,15 +740,17 @@
 
         function closeModal() { modal.style.display = 'none'; }
         
+        // ★ 라이트박스 로직 ★
         const lightbox = document.getElementById('lightbox-overlay');
         const lightboxImg = document.getElementById('lightbox-img');
 
         function openLightbox(src) {
             lightboxImg.src = src;
             lightbox.style.display = 'flex';
-            playKeySound();
+            playKeySound(); // 소리 효과
         }
         
+        // 모달의 메인 이미지를 클릭했을 때 호출
         function openLightboxFromModal() {
             if(currentModalImage) openLightbox(currentModalImage);
         }
@@ -732,6 +788,7 @@
             }, 1600);
         }
 
+        // ★ 지문 인식 로직 수정 ★
         const fpScanner = document.getElementById('fp-scanner');
         let holdTimer;
         let isHolding = false;
@@ -747,7 +804,7 @@
             currentUser = inputVal; 
 
             isHolding = true;
-            fpScanner.classList.add('scanning'); 
+            fpScanner.classList.add('scanning'); // 스캔 애니메이션 시작
             startChargeSound();
             
             holdTimer = setTimeout(() => {
@@ -755,7 +812,7 @@
                     stopChargeSound();
                     playUnlockSound();
                     fpScanner.classList.remove('scanning');
-                    fpScanner.classList.add('success'); 
+                    fpScanner.classList.add('success'); // 성공 색상 변경
                     grantAccess();
                     isHolding = false;
                 }
@@ -767,7 +824,7 @@
             isHolding = false;
             clearTimeout(holdTimer);
             stopChargeSound();
-            fpScanner.classList.remove('scanning'); 
+            fpScanner.classList.remove('scanning'); // 애니메이션 중단
         }
 
         fpScanner.addEventListener('mousedown', startHold);
@@ -806,10 +863,20 @@
 
         setInterval(() => {
             const d = new Date();
-            const min = String(d.getMinutes()).padStart(2, '0');
-            const sec = String(d.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').innerText = d.getHours() + ':' + min + ':' + sec;
+            document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
         }, 1000);
+
+        setInterval(() => {
+            const bpmEl = document.getElementById('hud-bpm');
+            let current = parseInt(bpmEl.innerText);
+            let change = Math.floor(Math.random() * 5) - 2; 
+            let next = current + change;
+            if(next > 120) next = 120;
+            if(next < 60) next = 60;
+            bpmEl.innerText = next;
+            if(next > 100) bpmEl.style.color = 'red';
+            else bpmEl.style.color = 'var(--gold)';
+        }, 2000);
 
         const logBox = document.getElementById('system-log');
         function addLog(msg) {
