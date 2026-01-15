@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Cage Dorée - SECURE ACCESS</title>
+    <title>La Cage Dorée - MEMBER ACCESS</title>
     <style>
-        /* 폰트 및 기본 설정 */
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Noto+Serif+KR:wght@500;700&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
         :root {
             --gold: #b38b48;
             --gold-light: #e6c88b;
+            --red-alert: #8b0000;
             --black: #050505;
+            --panel-bg: rgba(10, 10, 10, 0.95);
             --sys-font: 'Share Tech Mono', monospace;
         }
 
@@ -25,402 +26,623 @@
             height: 100vh;
         }
 
-        /* CCTV 효과 */
-        #cctv-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
-            pointer-events: none; z-index: 9000; opacity: 0.3;
-        }
-        .cctv-ui {
-            position: fixed; padding: 20px; color: var(--gold); font-family: var(--sys-font);
-            font-size: 0.8rem; z-index: 9001; pointer-events: none; text-shadow: 0 0 5px rgba(0,0,0,0.8);
-        }
-        .top-left { top: 0; left: 0; }
-        .top-right { top: 0; right: 0; }
-        .bottom-left { bottom: 0; left: 0; }
-        .rec-dot { color: red; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        /* 스크롤바 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-        /* [1단계] 봉투 및 암호 입력 */
+        /* ================= STAGE 1: INTRO (LOGIN) ================= */
         #stage-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #020202; z-index: 5000;
+            background: radial-gradient(circle at center, #151515 0%, #000 80%);
+            z-index: 5000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 1s;
         }
 
         .envelope-box {
-            width: 320px; margin-bottom: 50px; cursor: pointer;
-            transition: transform 0.3s; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+            width: 650px; max-width: 90vw;
+            cursor: pointer; position: relative;
+            animation: floating 4s ease-in-out infinite;
+            transition: transform 0.5s, filter 0.5s;
+            z-index: 10;
         }
-        .envelope-box:hover { transform: translateY(-5px); }
-        .envelope-box img { width: 100%; border: 1px solid #333; }
+        .envelope-box:hover { 
+            transform: scale(1.02) translateY(-10px); 
+            filter: drop-shadow(0 0 40px rgba(179, 139, 72, 0.4));
+        }
+        .envelope-box img { width: 100%; display: block; filter: drop-shadow(0 20px 30px #000); }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
         #auth-panel {
-            opacity: 0; transform: translateY(20px); transition: 0.5s;
+            opacity: 0; transform: translateY(30px); transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
             display: flex; flex-direction: column; align-items: center; gap: 20px;
+            background: var(--panel-bg);
+            padding: 40px; border: 1px solid var(--gold);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative; margin-top: -50px; 
         }
         #auth-panel.active { opacity: 1; transform: translateY(0); }
+        
+        .panel-title { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-bottom: 10px; letter-spacing: 2px; }
 
         .pass-input {
-            background: transparent; border: none; border-bottom: 2px solid #333;
+            background: rgba(0,0,0,0.5); border: 1px solid #444; border-bottom: 2px solid #444;
             color: var(--gold); font-family: 'Noto Serif KR'; font-weight: 700;
-            font-size: 1.5rem; text-align: center; padding: 10px; width: 350px; outline: none;
+            font-size: 1.5rem; text-align: center; padding: 15px; width: 300px; outline: none;
             transition: 0.3s;
         }
-        .pass-input:focus { border-bottom-color: var(--gold); }
+        .pass-input:focus { border-bottom-color: var(--gold); background: rgba(179, 139, 72, 0.05); }
+        .pass-input::placeholder { color: #333; font-weight: 300; font-size: 1rem; }
 
-        /* [홀드 버튼] */
-        .hold-btn-container {
-            position: relative; width: 280px; height: 70px; margin-top: 30px;
-        }
+        .hold-btn-container { position: relative; width: 300px; height: 60px; margin-top: 10px; }
         .hold-btn {
-            width: 100%; height: 100%; background: #0a0a0a; border: 1px solid #444;
-            color: #666; font-family: var(--sys-font); font-size: 1.2rem; letter-spacing: 2px;
+            width: 100%; height: 100%; background: #111; border: 1px solid var(--gold);
+            color: var(--gold); font-family: var(--sys-font); font-size: 1.1rem; letter-spacing: 2px;
             cursor: pointer; display: flex; justify-content: center; align-items: center;
             position: relative; overflow: hidden; transition: 0.2s;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .hold-btn:active { border-color: var(--gold); color: var(--gold); transform: scale(0.98); }
-        
+        .hold-btn:active { transform: scale(0.98); }
         .progress-fill {
             position: absolute; left: 0; top: 0; height: 100%; width: 0%;
-            background: var(--gold); opacity: 0.3; pointer-events: none;
+            background: var(--gold); opacity: 0.4; pointer-events: none;
         }
         .hold-text { position: relative; z-index: 10; }
 
-        /* [2단계] 전환 효과 */
+        /* ================= STAGE 2: TRANSITION ================= */
         #stage-transition {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 4000; display: none;
-            justify-content: center; align-items: center;
+            flex-direction: column; justify-content: center; align-items: center;
         }
         .access-text {
-            font-family: 'Cinzel'; font-weight: 900; font-size: 3rem; color: var(--gold);
-            letter-spacing: 5px; opacity: 0; transform: scale(0.9);
+            font-family: 'Noto Serif KR'; font-weight: 700; font-size: 2.5rem; color: var(--gold);
+            text-align: center; line-height: 1.4;
+            opacity: 0; transform: scale(0.9);
         }
-        .access-text.reveal { animation: heavyReveal 2.5s forwards; }
-
+        .access-text span { display: block; font-size: 1.2rem; font-family: var(--sys-font); color: #666; margin-top: 10px; }
+        .access-text.reveal { animation: heavyReveal 3s forwards; }
         @keyframes heavyReveal {
-            0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
-            20% { opacity: 1; transform: scale(1.02); filter: blur(0); text-shadow: 0 0 30px var(--gold); }
+            0% { opacity: 0; transform: scale(0.9); filter: blur(20px); }
+            20% { opacity: 1; transform: scale(1.05); filter: blur(0); text-shadow: 0 0 30px var(--gold); }
             100% { opacity: 1; transform: scale(1); text-shadow: none; }
         }
 
-        /* [3단계] 메인 컨텐츠 */
+        /* ================= STAGE 3: MAIN CONTENT & HUD ================= */
         #main-content {
             display: none; opacity: 0; transition: opacity 2s;
             height: 100vh; overflow-y: auto; padding-bottom: 100px;
-        }
-        .hero {
-            height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, rgba(0,0,0,0.5), #000), url('https://images.unsplash.com/photo-1542259681-d4cd718619bc?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover; background-position: center;
             position: relative;
         }
-        .hero h1 { font-family: 'Cinzel'; font-weight: 900; font-size: 4.5rem; color: var(--gold); margin-bottom: 10px; }
-        .hero p { font-family: var(--sys-font); color: #888; letter-spacing: 3px; }
 
-        /* 스크롤 화살표 */
-        .scroll-indicator {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            color: var(--gold); opacity: 0.7; animation: bounce 2s infinite;
+        /* ★ SYSTEM HUD (상단 바) ★ */
+        #system-hud {
+            position: fixed; top: 0; left: 0; width: 100%; height: 50px;
+            background: rgba(5, 5, 5, 0.9); border-bottom: 1px solid #333;
+            z-index: 3000; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; font-family: var(--sys-font); color: #666; font-size: 0.85rem;
+            backdrop-filter: blur(5px);
         }
-        .scroll-text { font-family: var(--sys-font); font-size: 0.7rem; letter-spacing: 2px; }
-        .arrow-down { font-size: 1.5rem; }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
-            40% {transform: translateX(-50%) translateY(-10px);}
-            60% {transform: translateX(-50%) translateY(-5px);}
+        .hud-left, .hud-right { display: flex; gap: 20px; align-items: center; }
+        
+        .hud-item { display: flex; align-items: center; gap: 8px; }
+        .hud-label { color: #444; }
+        .hud-value { color: var(--gold); font-weight: bold; }
+        
+        .live-dot { width: 8px; height: 8px; background: red; border-radius: 50%; animation: blink 1s infinite; }
+        .sanity-bar { width: 80px; height: 6px; background: #222; border: 1px solid #444; position: relative; }
+        .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
+
+        /* ★ SYSTEM LOG (우측 하단) ★ */
+        #system-log {
+            position: fixed; bottom: 20px; right: 20px; width: 300px; height: 150px;
+            background: rgba(0,0,0,0.8); border: 1px solid #333;
+            z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.7rem;
+            color: #555; overflow: hidden; pointer-events: none;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-line:last-child { color: var(--gold); animation: flash 0.5s; }
+        @keyframes flash { 0% { color: #fff; } 100% { color: var(--gold); } }
+
+        /* HERO SECTION */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            position: relative;
+        }
+        .hero-slogan { 
+            font-family: 'Noto Serif KR', serif; font-size: 1.1rem; font-weight: 300; 
+            letter-spacing: 8px; color: var(--gold); margin-bottom: 15px; opacity: 0.9;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+        .hero h1 { 
+            font-family: 'Cinzel', serif; font-weight: 900; font-size: 6rem; 
+            color: var(--gold); margin: 0; line-height: 1; text-shadow: 0 10px 50px #000; 
+        }
+        .hero-sub { 
+            font-family: var(--sys-font); color: #888; font-size: 0.9rem; 
+            margin-top: 20px; letter-spacing: 3px;
+        }
+        .scroll-down {
+            position: absolute; bottom: 40px; color: var(--gold); animation: bounce 2s infinite;
+            display: flex; flex-direction: column; align-items: center; gap: 5px; opacity: 0.7;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .hero-slogan { font-size: 0.9rem; letter-spacing: 3px; }
+            #system-hud { padding: 0 10px; font-size: 0.7rem; }
+            .hud-right { display: none; } /* 모바일에서 일부 숨김 */
         }
 
-        section { max-width: 1000px; margin: 120px auto; padding: 0 40px; }
-        .sec-header { border-left: 4px solid var(--gold); padding-left: 20px; margin-bottom: 50px; }
-        .sec-title { font-family: 'Cinzel'; font-weight: 700; font-size: 2.2rem; color: var(--gold); }
-        .sec-sub { font-family: var(--sys-font); color: #666; margin-top: 5px; }
+        /* CONTENT SECTIONS */
+        section { max-width: 1200px; margin: 150px auto; padding: 0 40px; }
+        .sec-header { text-align: center; margin-bottom: 80px; }
+        .sec-title { font-family: 'Cinzel'; font-size: 3rem; color: var(--gold); margin-bottom: 15px; }
+        .sec-desc { color: #888; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-        /* Redacted 효과 */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .info-text h3 { color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 20px; border-left: 3px solid var(--gold); padding-left: 15px; }
+        .info-text p { color: #ccc; line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        .info-text li { margin-bottom: 10px; list-style: none; color: #aaa; }
+        .info-text li::before { content: '◈'; color: var(--gold); margin-right: 10px; }
+        .info-img { width: 100%; height: 400px; background: #111; border: 1px solid #333; object-fit: cover; filter: grayscale(50%); transition: 0.5s; }
+        .info-img:hover { filter: grayscale(0%); border-color: var(--gold); }
+
+        .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .room-card {
+            height: 250px; position: relative; border: 1px solid #333; overflow: hidden; cursor: pointer; group;
+        }
+        .room-bg {
+            width: 100%; height: 100%; background-size: cover; background-position: center;
+            transition: transform 0.5s, filter 0.5s; filter: grayscale(100%) brightness(0.5);
+        }
+        .room-card:hover .room-bg { transform: scale(1.1); filter: grayscale(0%) brightness(0.8); }
+        .room-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px;
+            background: linear-gradient(to top, #000, transparent);
+        }
+        .room-name { font-family: 'Cinzel'; font-size: 1.5rem; color: #fff; margin-bottom: 5px; }
+        .room-meta { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; }
+
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .char-card {
+            background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s;
+        }
+        .char-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 10px 30px rgba(179, 139, 72, 0.1); }
+        .char-img {
+            width: 100%; height: 400px; background-size: cover; background-position: top center;
+            filter: grayscale(100%); transition: 0.5s;
+        }
+        .char-card:hover .char-img { filter: grayscale(0%); }
+        .char-info { padding: 20px; text-align: center; border-top: 1px solid #222; }
+        .c-alias { font-family: 'Cinzel'; font-size: 1.5rem; color: #fff; }
+        .c-role { color: var(--gold); font-family: var(--sys-font); margin-top: 5px; display: block; }
+
+        /* 모달 & 기타 */
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 10000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .modal-box {
+            width: 90%; max-width: 1000px; height: 85vh; background: #0e0e0e;
+            border: 1px solid var(--gold); display: flex; box-shadow: 0 0 100px rgba(0,0,0,0.8);
+            position: relative; animation: modalOpen 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalOpen { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-left { width: 45%; border-right: 1px solid #333; position: relative; overflow: hidden; }
+        .modal-main-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: 0.3s; }
+        .modal-right { width: 55%; padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #555; cursor: pointer; z-index: 10; }
+        
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;
+        }
+        .gallery-thumb {
+            height: 80px; background-size: cover; background-position: center; cursor: pointer;
+            border: 1px solid #333; filter: grayscale(100%); transition: 0.2s;
+        }
+        .gallery-thumb:hover { filter: grayscale(0%); border-color: var(--gold); }
+
+        .m-stamp { 
+            border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900;
+            display: inline-block; padding: 5px 15px; transform: rotate(-2deg); margin-bottom: 20px; width: fit-content;
+        }
+        .m-title { font-family: 'Cinzel'; font-size: 3rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
+        .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 30px; font-size: 0.9rem; }
+        .m-section { margin-bottom: 30px; }
+        .m-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; display: block; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .m-text { font-size: 1.05rem; line-height: 1.8; color: #ccc; white-space: pre-line; }
+
         .redacted {
             background: #000; color: #000; padding: 0 5px; cursor: help; border: 1px solid #333; transition: 0.3s; position: relative;
         }
         .redacted::after {
             content: 'RESTRICTED'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            color: #333; font-family: var(--sys-font); font-size: 0.7rem; pointer-events: none;
+            color: #333; font-family: var(--sys-font); font-size: 0.6rem; pointer-events: none;
         }
         .redacted:hover { background: transparent; color: var(--gold-light); border-color: var(--gold); }
         .redacted:hover::after { content: ''; }
 
-        /* Floor Plan */
-        .floor-plan {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-            border: 2px solid #222; padding: 20px; background: #080808;
-        }
-        .room-box {
-            height: 120px; border: 1px solid #333; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; transition: 0.3s; cursor: crosshair; position: relative;
-        }
-        .room-box:hover { border-color: var(--gold); background: rgba(179, 139, 72, 0.05); }
-        .room-name { font-family: 'Cinzel'; font-weight: 700; color: #888; transition: 0.3s; }
-        .room-box:hover .room-name { color: var(--gold); }
-        .room-details {
-            position: absolute; bottom: 10px; font-family: var(--sys-font); font-size: 0.7rem; color: #555; opacity: 0; transition: 0.3s;
-        }
-        .room-box:hover .room-details { opacity: 1; }
-
-        /* Character Grid */
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .char-card { background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
-        .char-card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .char-img {
-            width: 100%; height: 350px; background-size: cover; background-position: center;
-            filter: grayscale(100%) contrast(1.2); transition: 0.5s;
-        }
-        .char-card:hover .char-img { filter: grayscale(0%); }
-        .char-info { padding: 20px; border-top: 1px solid #222; }
-        .c-alias { font-family: 'Cinzel'; font-weight: 700; font-size: 1.2rem; color: var(--gold); }
-        .c-role { font-family: var(--sys-font); font-size: 0.8rem; color: #666; margin-top: 5px; }
-
-        /* Modal */
-        #modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 10000; display: none;
-            justify-content: center; align-items: center;
-        }
-        .dossier-paper {
-            width: 90%; max-width: 900px; height: 80vh; background: #0e0e0e;
-            border: 1px solid var(--gold); display: flex; box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
-        .d-img { width: 40%; background-size: cover; background-position: center; border-right: 1px solid #333; filter: sepia(20%); }
-        .d-content { width: 60%; padding: 50px; overflow-y: auto; }
-        .d-stamp {
-            border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900;
-            display: inline-block; padding: 5px 15px; transform: rotate(-5deg); margin-bottom: 20px; opacity: 0.8;
-        }
-        .d-title { font-family: 'Cinzel'; font-size: 2.5rem; color: var(--gold); margin-bottom: 5px; }
-        .d-meta { font-family: var(--sys-font); color: #666; margin-bottom: 30px; }
-        .d-section { margin-bottom: 25px; }
-        .d-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.8rem; display: block; margin-bottom: 8px; }
-        .d-text { font-size: 1rem; line-height: 1.8; color: #ccc; }
-        .close-btn { float: right; font-size: 2rem; cursor: pointer; color: #444; }
-        .close-btn:hover { color: #fff; }
+        footer { text-align: center; padding: 80px 0; color: #444; font-family: var(--sys-font); font-size: 0.8rem; border-top: 1px solid #222; }
 
     </style>
 </head>
 <body>
 
-    <!-- 유튜브 플레이어 (숨김) -->
     <div id="youtube-player" style="display:none;"></div>
-
-    <!-- UI -->
-    <div id="cctv-layer"></div>
-    <div class="cctv-ui top-left"><span class="rec-dot">●</span> REC</div>
-    <div class="cctv-ui top-right">CAM-01 [LIVE]</div>
-    <div class="cctv-ui bottom-left" id="clock">00:00:00:00</div>
 
     <!-- STAGE 1: INTRO -->
     <div id="stage-intro">
         <div class="envelope-box" onclick="revealInput()">
-            <!-- 봉투 이미지 -->
-            <img src="https://via.placeholder.com/320x220/111/444?text=ENCRYPTED+MAIL" alt="Envelope">
+            <img src="https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/Generated%20Image%20January%2015%2C%202026%20-%209_30PM-Photoroom.png" alt="Invitation">
         </div>
 
         <div id="auth-panel">
-            <input type="text" class="pass-input" id="pass-input" placeholder="PASSPHRASE" autocomplete="off">
+            <div class="panel-title">IDENTITY VERIFICATION</div>
+            <!-- 코드네임 입력으로 변경 -->
+            <input type="text" class="pass-input" id="pass-input" placeholder="코드네임 입력 (Enter Codename)" autocomplete="off" maxlength="12">
             
             <div class="hold-btn-container">
                 <div class="hold-btn" id="hold-btn">
                     <div class="progress-fill" id="progress-fill"></div>
-                    <span class="hold-text">HOLD TO ACCESS</span>
+                    <span class="hold-text">HOLD TO SCAN</span>
                 </div>
             </div>
-            <p style="font-family: var(--sys-font); color: #444; font-size: 0.8rem;">SECURE CONNECTION REQUIRED</p>
+            <p style="font-family: var(--sys-font); color: #555; font-size: 0.8rem; margin-top: 10px;">
+                BIOMETRIC SCAN REQUIRED
+            </p>
         </div>
     </div>
 
     <!-- STAGE 2: TRANSITION -->
     <div id="stage-transition">
-        <div class="access-text" id="access-text">ACCESS GRANTED</div>
+        <div class="access-text" id="access-text">
+            <!-- JS로 텍스트 채움 -->
+        </div>
     </div>
 
     <!-- STAGE 3: MAIN CONTENT -->
     <div id="main-content">
-        <div class="hero">
-            <h1>La Cage Dorée</h1>
-            <p>THE GOLDEN BIRDCAGE // PRIVATE SECTOR</p>
-            
-            <!-- 스크롤 화살표 -->
-            <div class="scroll-indicator">
-                <span class="scroll-text">SCROLL</span>
-                <span class="arrow-down">↓</span>
+        
+        <!-- ★ 상단 HUD: 진짜 접속한 느낌 ★ -->
+        <div id="system-hud">
+            <div class="hud-left">
+                <div class="hud-item"><span class="live-dot"></span> <span style="color:#8b0000; font-weight:bold;">LIVE MONITORING</span></div>
+                <div class="hud-item"><span class="hud-label">USER:</span> <span class="hud-value" id="hud-user">UNKNOWN</span></div>
+                <div class="hud-item"><span class="hud-label">RANK:</span> <span class="hud-value">GUEST</span></div>
+            </div>
+            <div class="hud-right">
+                <div class="hud-item"><span class="hud-label">SANITY:</span> <div class="sanity-bar"><div class="sanity-fill"></div></div></div>
+                <div class="hud-item"><span class="hud-label">BPM:</span> <span class="hud-value" id="hud-bpm">82</span></div>
+                <div class="hud-item" id="clock">00:00:00</div>
             </div>
         </div>
 
+        <!-- ★ 시스템 로그 (우측 하단) ★ -->
+        <div id="system-log">
+            <div class="log-line">[SYSTEM] Initializing connection...</div>
+        </div>
+
+        <div class="hero">
+            <div class="hero-slogan">"욕망은 허락된 자만이 누릴 수 있다"</div>
+            <h1>La Cage Dorée</h1>
+            <p class="hero-sub">THE GOLDEN BIRDCAGE // PRIVATE SECTOR</p>
+            
+            <div class="scroll-down">
+                <span style="font-family: var(--sys-font); font-size: 0.8rem;">SCROLL</span>
+                <span style="font-size: 1.5rem;">↓</span>
+            </div>
+        </div>
+
+        <!-- 1. 클럽 소개 -->
         <section>
             <div class="sec-header">
-                <h2 class="sec-title">Facility Overview</h2>
-                <div class="sec-sub">CONFIDENTIALITY LEVEL: 1</div>
+                <h2 class="sec-title">The Sanctuary</h2>
+                <div class="sec-desc">서울 강남 지하 깊은 곳, 선택받은 자들을 위한 황금 새장</div>
             </div>
-            <p style="line-height: 2; font-size: 1.1rem; color: #aaa;">
-                본 시설은 상류층을 위한 <span class="redacted">비밀 BDSM 클럽</span>입니다.<br>
-                겉으로는 평범한 갤러리이나, 내부는 철저히 통제된 <span class="redacted">황금 새장</span>입니다.<br>
-                내부에서의 모든 행위는 <span class="redacted">기록되지 않으나 관찰됩니다.</span>
-            </p>
+            
+            <div class="info-grid">
+                <img src="https://via.placeholder.com/600x400/111/333?text=Club+Interior" class="info-img" alt="Club" onclick="addLog('User examined Club Interior')">
+                <div class="info-text">
+                    <h3>Membership Criteria</h3>
+                    <ul>
+                        <li>기존 회원의 추천 및 초대장 소지자</li>
+                        <li>48시간 이내 발급된 <span class="redacted">유효한 의료 검진</span> 결과</li>
+                        <li>사회적 지위 및 비밀 유지 서약 확인</li>
+                    </ul>
+                    <br>
+                    <h3>Club Rules</h3>
+                    <ul>
+                        <li><strong>Mask:</strong> 입장 순간부터 퇴장 시까지 RFID 가면 착용 필수.</li>
+                        <li><strong>Privacy:</strong> 실명 사용 금지. 오직 코드네임으로만 호칭.</li>
+                        <li><strong>Consent:</strong> "No means no." 거부는 존중하되, <span class="redacted">침묵은 동의가 아님.</span></li>
+                        <li><strong>Security:</strong> 모든 전자기기 반입 금지. 적발 시 영구 제명.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
+        <!-- 2. 룸 -->
         <section>
             <div class="sec-header">
-                <h2 class="sec-title">Sector Map</h2>
-                <div class="sec-sub">REAL-TIME STATUS</div>
+                <h2 class="sec-title">Facilities</h2>
+                <div class="sec-desc">각기 다른 테마로 설계된 프라이빗 룸</div>
             </div>
-            <div class="floor-plan">
-                <div class="room-box"><div class="room-name">LOUNGE</div><div class="room-details">OCCUPANCY: 12 / LUX: 40</div></div>
-                <div class="room-box"><div class="room-name">BLACK ROOM</div><div class="room-details">STATUS: <span style="color:red">OCCUPIED</span></div></div>
-                <div class="room-box"><div class="room-name">MIRROR ROOM</div><div class="room-details">STATUS: VACANT</div></div>
-                <div class="room-box"><div class="room-name">THEATER</div><div class="room-details">SHOW START: 22:00</div></div>
-                <div class="room-box"><div class="room-name">CLINIC</div><div class="room-details">DR. WHITE ON DUTY</div></div>
-                <div class="room-box"><div class="room-name">V.I.P SUITE</div><div class="room-details">ACCESS DENIED</div></div>
-            </div>
+            <div class="room-grid" id="room-grid"></div>
         </section>
 
+        <!-- 3. 캐릭터 -->
         <section>
             <div class="sec-header">
-                <h2 class="sec-title">Subject Database</h2>
-                <div class="sec-sub">AUTHORIZED PERSONNEL ONLY</div>
+                <h2 class="sec-title">Key Figures</h2>
+                <div class="sec-desc">이곳을 움직이는 주요 인물들</div>
             </div>
             <div class="char-grid" id="char-grid"></div>
         </section>
 
-        <footer style="text-align: center; padding: 50px; color: #333; font-family: var(--sys-font);">
-            © 2026 La Cage Dorée. System ID: 938-A2
+        <footer>
+            © 2026 La Cage Dorée. All rights reserved.<br>
+            System ID: 938-A2 // Connection Secure.
         </footer>
     </div>
 
-    <!-- MODAL -->
+    <!-- 통합 모달 -->
     <div id="modal-overlay" onclick="closeModal()">
-        <div class="dossier-paper" onclick="event.stopPropagation()">
-            <div class="d-img" id="m-img"></div>
-            <div class="d-content">
-                <span class="close-btn" onclick="closeModal()">&times;</span>
-                <div class="d-stamp">TOP SECRET</div>
-                <h2 class="d-title" id="m-alias">ALIAS</h2>
-                <div class="d-meta" id="m-meta">Real Name | Age | Role</div>
-                <div class="d-section"><span class="d-label">PERSONALITY</span><p class="d-text" id="m-pers"></p></div>
-                <div class="d-section"><span class="d-label">BACKGROUND</span><p class="d-text" id="m-bg"></p></div>
-                <div class="d-section"><span class="d-label">NOTES</span><p class="d-text" style="color:#888; font-style:italic;" id="m-note"></p></div>
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-left">
+                <div class="modal-main-img" id="m-img"></div>
+            </div>
+            <div class="modal-right">
+                <div class="m-stamp" id="m-stamp">CONFIDENTIAL</div>
+                <h2 class="m-title" id="m-title">TITLE</h2>
+                <div class="m-sub" id="m-sub">Subtitle</div>
+                <div id="m-content-area"></div>
+                <!-- 갤러리 영역 -->
+                <div class="gallery-grid" id="m-gallery"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // =========================================================
-        // ★★★ 여기에 유튜브 영상 ID를 넣으세요! ★★★
         const YOUTUBE_ID = "bG_UV0owkkE"; 
-        // =========================================================
+        let currentUser = "GUEST"; // 유저 코드네임 저장
 
+        // 오디오 컨텍스트
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        let chargeOsc1 = null; 
-        let chargeOsc2 = null; 
-        let chargeGain = null;
+        let chargeOsc1, chargeOsc2, chargeGain;
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // [사운드 1] 게이지 충전음 (낮은 진동)
+        function playKeySound() {
+            if (!audioCtx) initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(800 + Math.random() * 200, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.05);
+
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(200, now);
+            gain2.gain.setValueAtTime(0.05, now);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc2.connect(gain2); gain2.connect(audioCtx.destination);
+            osc2.start(now); osc2.stop(now + 0.08);
+        }
+
+        document.getElementById('pass-input').addEventListener('input', () => {
+            playKeySound();
+        });
+
         function startChargeSound() {
             if (!audioCtx) initAudio();
-            if (chargeOsc1) return; 
-
+            if (chargeOsc1) return;
             chargeGain = audioCtx.createGain();
             chargeGain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
-
-            // 저음 (40Hz -> 80Hz)
-            chargeOsc1 = audioCtx.createOscillator();
-            chargeOsc1.type = 'sine'; 
+            chargeOsc1 = audioCtx.createOscillator(); chargeOsc1.type = 'sine';
             chargeOsc1.frequency.setValueAtTime(40, now);
             chargeOsc1.frequency.linearRampToValueAtTime(80, now + 2.0);
             chargeOsc1.connect(chargeGain);
-
-            // 질감 (Triangle 60Hz -> 100Hz)
-            chargeOsc2 = audioCtx.createOscillator();
-            chargeOsc2.type = 'triangle';
+            chargeOsc2 = audioCtx.createOscillator(); chargeOsc2.type = 'triangle';
             chargeOsc2.frequency.setValueAtTime(60, now);
             chargeOsc2.frequency.linearRampToValueAtTime(100, now + 2.0);
             chargeOsc2.connect(chargeGain);
-
-            // 볼륨
             chargeGain.gain.setValueAtTime(0, now);
-            chargeGain.gain.linearRampToValueAtTime(0.3, now + 2.0); 
-
-            chargeOsc1.start(now);
-            chargeOsc2.start(now);
+            chargeGain.gain.linearRampToValueAtTime(0.3, now + 2.0);
+            chargeOsc1.start(now); chargeOsc2.start(now);
         }
 
-        // [사운드 2] 중단
         function stopChargeSound() {
             if (chargeOsc1) {
                 const now = audioCtx.currentTime;
                 chargeGain.gain.cancelScheduledValues(now);
                 chargeGain.gain.setValueAtTime(chargeGain.gain.value, now);
                 chargeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-                chargeOsc1.stop(now + 0.05);
-                chargeOsc2.stop(now + 0.05);
+                chargeOsc1.stop(now + 0.05); chargeOsc2.stop(now + 0.05);
                 chargeOsc1 = null; chargeOsc2 = null; chargeGain = null;
             }
         }
 
-        // [사운드 3] 승인 (쿵!)
         function playUnlockSound() {
             if (!audioCtx) initAudio();
             const now = audioCtx.currentTime;
-
-            // 묵직한 타격음
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.5);
-            gain.gain.setValueAtTime(1.0, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start(now); osc.stop(now + 0.5);
-
-            // 철컥 소리
+            const osc1 = audioCtx.createOscillator();
+            const gain1 = audioCtx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(1500, now);
+            gain1.gain.setValueAtTime(0.1, now);
+            gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc1.connect(gain1); gain1.connect(audioCtx.destination);
+            osc1.start(now); osc1.stop(now + 0.1);
             const osc2 = audioCtx.createOscillator();
             const gain2 = audioCtx.createGain();
-            osc2.type = 'square';
-            osc2.frequency.setValueAtTime(50, now);
-            osc2.frequency.exponentialRampToValueAtTime(0.01, now + 0.2);
-            gain2.gain.setValueAtTime(0.5, now);
-            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-            osc2.connect(gain2);
-            gain2.connect(audioCtx.destination);
-            osc2.start(now); osc2.stop(now + 0.2);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(2500, now + 0.15);
+            gain2.gain.setValueAtTime(0.1, now + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc2.connect(gain2); gain2.connect(audioCtx.destination);
+            osc2.start(now + 0.15); osc2.stop(now + 0.4);
         }
 
-        // [사운드 4] 기타 효과음
-        function playSfx(type) {
+        function playHoverSound() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             const now = audioCtx.currentTime;
-
-            if (type === 'hover') { 
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(40, now);
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            }
-            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(40, now);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.1);
         }
 
-        // --- INTERACTION ---
+        // --- 데이터 ---
+        const rooms = [
+            { name: "흑단실 (Black Room)", img: "https://via.placeholder.com/400x300/000/333?text=Black+Room", status: "OCCUPIED", desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다." },
+            { name: "거울방 (Mirror Room)", img: "https://via.placeholder.com/400x300/111/333?text=Mirror+Room", status: "VACANT", desc: "사방이 거울로 둘러싸인 방. 자신의 쾌락과 수치를 다각도에서 관찰할 수 있습니다. 조명 조절이 가능합니다." },
+            { name: "비밀극장 (The Theater)", img: "https://via.placeholder.com/400x300/222/333?text=Theater", status: "SHOW 22:00", desc: "관음과 노출의 경계. 무대 위에서의 플레이와 그것을 지켜보는 관객석이 존재합니다. 익명성이 보장됩니다." },
+            { name: "의상실 (Dressing Room)", img: "https://via.placeholder.com/400x300/333/333?text=Dressing", status: "OPEN", desc: "다양한 코스튬과 도구가 준비된 공간. 당신의 페르소나를 완성하십시오." },
+            { name: "상담실 (The Clinic)", img: "https://via.placeholder.com/400x300/444/333?text=Clinic", status: "DR.WHITE", desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다." },
+            { name: "V.I.P Suite", img: "https://via.placeholder.com/400x300/555/333?text=VIP", status: "RESTRICTED", desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다." }
+        ];
+
+        const characters = [
+            { 
+                id: 1, alias: "OBSIDIAN", name: "차도윤", role: "DOMINANT", 
+                img: "https://via.placeholder.com/400x600/111/555?text=Obsidian+Main", 
+                gallery: ["https://via.placeholder.com/150/111/555?text=Suit", "https://via.placeholder.com/150/111/555?text=Eyes", "https://via.placeholder.com/150/111/555?text=Hand", "https://via.placeholder.com/150/111/555?text=Shadow"],
+                meta: "차도윤 | 28세 | CL그룹 후계자", pers: "고급스러움과 냉혹함. 말수가 적고 눈빛과 행동으로 압도함.", bg: "재벌 가문 출신. <span class='redacted'>가장 위험한 도미넌트</span>로 분류됨.", note: "통제광." 
+            },
+            { 
+                id: 2, alias: "AURUM", name: "서율", role: "DOMINANT (SOFT)", 
+                img: "https://via.placeholder.com/400x600/222/555?text=Aurum+Main", 
+                gallery: ["https://via.placeholder.com/150/222/555?text=Smile", "https://via.placeholder.com/150/222/555?text=Glasses", "https://via.placeholder.com/150/222/555?text=Book", "https://via.placeholder.com/150/222/555?text=Light"],
+                meta: "서율 | 27세 | 심리상담사", pers: "다정하고 상냥하지만 심리를 장악하는 데 능함.", bg: "초보자를 다루는 데 특화됨. 내면 깊은 곳엔 <span class='redacted'>강한 독점욕</span>이 숨겨져 있음.", note: "경계 요망." 
+            },
+            { 
+                id: 3, alias: "ECHO", name: "류이안", role: "SUBMISSIVE", 
+                img: "https://via.placeholder.com/400x600/151515/555?text=Echo+Main", 
+                gallery: ["https://via.placeholder.com/150/151515/555?text=Stage", "https://via.placeholder.com/150/151515/555?text=Tears", "https://via.placeholder.com/150/151515/555?text=Collar", "https://via.placeholder.com/150/151515/555?text=Kneel"],
+                meta: "류이안 | 26세 | 배우", pers: "무대 위에선 빛나지만 클럽에선 복종을 갈구함.", bg: "감정이 과열되면 <span class='redacted'>위험한 집착</span>으로 돌변할 수 있음.", note: "애정 결핍." 
+            },
+            {
+                id: 4, alias: "GLASS", name: "노엘", role: "SWITCH",
+                img: "https://via.placeholder.com/400x600/1a1a1a/555?text=Glass+Main", gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
+                meta: "노엘 | 29세 | 행동 심리학자", pers: "장난기 많지만 거리감 유지. 영어를 섞어 씀.", bg: "유저를 연구 대상으로 여김. <span class='redacted'>실험적인 플레이</span>를 즐김.", note: "예측 불가."
+            },
+            {
+                id: 5, alias: "RENAULT", name: "르노", role: "OWNER",
+                img: "https://via.placeholder.com/400x600/0d0d0d/555?text=Renault+Main", gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
+                meta: "르노 | 미상 | 클럽 오너", pers: "조용하지만 사람을 꿰뚫는 통찰력.", bg: "클럽의 절대 권력자. 과거 신원 불명.", note: "접근 주의."
+            },
+            {
+                id: 6, alias: "WHITE MISTRESS", name: "진보라", role: "DOMINA",
+                img: "https://via.placeholder.com/400x600/202020/555?text=White+Main", gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
+                meta: "진보라 | 29세 | 큐레이터", pers: "냉정하고 도도함. 사람을 미술품처럼 감상.", bg: "클럽 규칙 위반자를 즉시 제재함. 과거 <span class='redacted'>차도윤의 연인</span>.", note: "규칙 엄수."
+            }
+        ];
+
+        const roomGrid = document.getElementById('room-grid');
+        rooms.forEach(room => {
+            const div = document.createElement('div');
+            div.className = 'room-card';
+            div.onclick = () => { openRoomModal(room); addLog(`Accessing Facility: ${room.name}`); };
+            div.innerHTML = `
+                <div class="room-bg" style="background-image: url('${room.img}')"></div>
+                <div class="room-overlay">
+                    <div class="room-name">${room.name}</div>
+                    <div class="room-meta">${room.status}</div>
+                </div>
+            `;
+            roomGrid.appendChild(div);
+        });
+
+        const charGrid = document.getElementById('char-grid');
+        characters.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'char-card';
+            div.onclick = () => { openCharModal(c); addLog(`Viewing Profile: ${c.alias}`); };
+            div.innerHTML = `
+                <div class="char-img" style="background-image: url('${c.img}')"></div>
+                <div class="char-info">
+                    <div class="c-alias">${c.alias}</div>
+                    <div class="c-role">${c.role}</div>
+                </div>
+            `;
+            charGrid.appendChild(div);
+        });
+
+        const modal = document.getElementById('modal-overlay');
+        const mImg = document.getElementById('m-img');
+        const mTitle = document.getElementById('m-title');
+        const mSub = document.getElementById('m-sub');
+        const mContent = document.getElementById('m-content-area');
+        const mGallery = document.getElementById('m-gallery');
+        const mStamp = document.getElementById('m-stamp');
+
+        function openRoomModal(room) {
+            mImg.style.backgroundImage = `url('${room.img}')`;
+            mStamp.innerText = "FACILITY";
+            mStamp.style.color = "#ccc"; mStamp.style.borderColor = "#ccc";
+            mTitle.innerText = room.name.split(' (')[0];
+            mSub.innerText = room.status;
+            mContent.innerHTML = `<div class="m-section"><span class="m-label">DESCRIPTION</span><p class="m-text">${room.desc}</p></div>`;
+            mGallery.style.display = 'none';
+            modal.style.display = 'flex';
+            attachRedactedEvent();
+        }
+
+        function openCharModal(c) {
+            mImg.style.backgroundImage = `url('${c.img}')`;
+            mStamp.innerText = "TOP SECRET";
+            mStamp.style.color = "#8b0000"; mStamp.style.borderColor = "#8b0000";
+            mTitle.innerText = c.alias;
+            mSub.innerText = c.meta;
+            mContent.innerHTML = `
+                <div class="m-section"><span class="m-label">PERSONALITY</span><p class="m-text">${c.pers}</p></div>
+                <div class="m-section"><span class="m-label">BACKGROUND</span><p class="m-text">${c.bg}</p></div>
+                <div class="m-section"><span class="m-label">NOTES</span><p class="m-text" style="color:#888; font-style:italic;">${c.note}</p></div>
+            `;
+            mGallery.innerHTML = '';
+            mGallery.style.display = 'grid';
+            if(c.gallery && c.gallery.length > 0) {
+                c.gallery.forEach(src => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'gallery-thumb';
+                    thumb.style.backgroundImage = `url('${src}')`;
+                    thumb.onclick = () => { mImg.style.backgroundImage = `url('${src}')`; };
+                    mGallery.appendChild(thumb);
+                });
+            }
+            modal.style.display = 'flex';
+            attachRedactedEvent();
+        }
+
+        function closeModal() { modal.style.display = 'none'; }
+        
+        function attachRedactedEvent() {
+            document.querySelectorAll('.redacted').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    playHoverSound();
+                    addLog("Warning: Restricted info accessed");
+                });
+            });
+        }
+
         function revealInput() {
             initAudio();
             document.querySelector('.envelope-box').style.opacity = '0';
@@ -431,7 +653,6 @@
             }, 500);
         }
 
-        // --- HOLD LOGIC ---
         const holdBtn = document.getElementById('hold-btn');
         const progressFill = document.getElementById('progress-fill');
         let holdTimer;
@@ -439,21 +660,23 @@
 
         function startHold(e) {
             if (e.button && e.button !== 0) return;
-            const pass = document.getElementById('pass-input').value.replace(/\s/g, '');
-            if(pass !== '욕망은허락된자만이누릴수있다') {
+            const inputVal = document.getElementById('pass-input').value.trim();
+            
+            // 코드네임이 비어있으면 경고
+            if(inputVal.length < 1) {
                 document.getElementById('pass-input').style.borderBottomColor = '#8b0000';
                 return;
             }
+            currentUser = inputVal; // 유저 이름 저장
 
             isHolding = true;
             startChargeSound();
             progressFill.style.transition = 'width 2.0s linear';
             progressFill.style.width = '100%';
-
             holdTimer = setTimeout(() => {
                 if (isHolding) {
                     stopChargeSound();
-                    playUnlockSound(); // 쾅!
+                    playUnlockSound();
                     grantAccess();
                     isHolding = false;
                 }
@@ -474,21 +697,22 @@
         holdBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(e); });
         window.addEventListener('touchend', endHold);
 
-        // --- TRANSITION ---
         function grantAccess() {
             document.getElementById('stage-intro').style.display = 'none';
             const trans = document.getElementById('stage-transition');
-            trans.style.display = 'flex';
+            const accessText = document.getElementById('access-text');
             
-            const txt = document.getElementById('access-text');
-            txt.classList.add('reveal');
+            // ★ 승인 메시지 변경 ★
+            accessText.innerHTML = `${currentUser}님,<br>승인되었습니다.<br><span>ACCESS GRANTED</span>`;
+            
+            // ★ HUD에 유저 이름 적용 ★
+            document.getElementById('hud-user').innerText = currentUser.toUpperCase();
 
-            // ★ 음악 재생 (여기서 실행됨) ★
-            if(player && player.playVideo) { 
-                player.playVideo(); 
-                player.setVolume(70); 
-            }
-
+            trans.style.display = 'flex';
+            accessText.classList.add('reveal');
+            
+            if(player && player.playVideo) { player.playVideo(); player.setVolume(70); }
+            
             setTimeout(() => {
                 trans.style.opacity = 0;
                 trans.style.transition = 'opacity 1.5s ease';
@@ -496,76 +720,49 @@
                     trans.style.display = 'none';
                     const main = document.getElementById('main-content');
                     main.style.display = 'block';
-                    setTimeout(() => main.style.opacity = 1, 100);
+                    setTimeout(() => {
+                        main.style.opacity = 1;
+                        addLog(`User [${currentUser}] connected.`);
+                        addLog("Biometric data synced.");
+                    }, 100);
                 }, 1500);
             }, 3000);
         }
 
-        // --- DATA ---
-        document.querySelectorAll('.redacted').forEach(el => {
-            el.addEventListener('mouseenter', () => playSfx('hover'));
-        });
-
+        // --- 실시간 시스템 기능 ---
+        
+        // 1. 시계
         setInterval(() => {
             const d = new Date();
             document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
         }, 1000);
 
-        const characters = [
-            { id: 1, alias: "OBSIDIAN", name: "차도윤", role: "DOMINANT", img: "https://via.placeholder.com/400x600/111/555?text=Obsidian", 
-              meta: "차도윤 | 28세 | CL그룹 후계자", 
-              pers: "고급스러움과 냉혹함. 말수가 적고 눈빛과 행동으로 압도함.",
-              bg: "재벌 가문 출신. <span class='redacted'>가장 위험한 도미넌트</span>로 분류됨.", note: "통제광 기질." },
-            { id: 2, alias: "AURUM", name: "서율", role: "DOMINANT (SOFT)", img: "https://via.placeholder.com/400x600/222/555?text=Aurum", 
-              meta: "서율 | 27세 | 심리상담사", 
-              pers: "다정하고 상냥하지만 심리를 장악하는 데 능함.",
-              bg: "초보자를 다루는 데 특화됨. 내면 깊은 곳엔 <span class='redacted'>강한 독점욕</span>이 숨겨져 있음.", note: "경계 대상." },
-            { id: 3, alias: "ECHO", name: "류이안", role: "SUBMISSIVE", img: "https://via.placeholder.com/400x600/151515/555?text=Echo", 
-              meta: "류이안 | 26세 | 배우", 
-              pers: "무대 위에선 빛나지만 클럽에선 복종을 갈구함.",
-              bg: "감정이 과열되면 <span class='redacted'>위험한 집착</span>으로 돌변할 수 있음.", note: "애정 결핍." },
-            { id: 4, alias: "GLASS", name: "노엘", role: "SWITCH", img: "https://via.placeholder.com/400x600/1a1a1a/555?text=Glass", 
-              meta: "노엘 | 29세 | 행동 심리학자", 
-              pers: "장난기 많지만 거리감 유지. 영어를 섞어 씀.",
-              bg: "유저를 연구 대상으로 여김. <span class='redacted'>실험적인 플레이</span>를 즐김.", note: "예측 불가." },
-            { id: 5, alias: "RENAULT", name: "르노", role: "OWNER", img: "https://via.placeholder.com/400x600/0d0d0d/555?text=Renault", 
-              meta: "르노 | 미상 | 클럽 오너", 
-              pers: "조용하지만 사람을 꿰뚫는 통찰력.",
-              bg: "클럽의 절대 권력자. 과거 신원 불명.", note: "접근 주의." },
-            { id: 6, alias: "WHITE MISTRESS", name: "진보라", role: "DOMINA", img: "https://via.placeholder.com/400x600/202020/555?text=White", 
-              meta: "진보라 | 29세 | 큐레이터", 
-              pers: "냉정하고 도도함. 사람을 미술품처럼 감상.",
-              bg: "클럽 규칙 위반자를 즉시 제재함. 과거 <span class='redacted'>차도윤의 연인</span>.", note: "규칙 엄수." }
-        ];
+        // 2. 심박수 (랜덤 변화)
+        setInterval(() => {
+            const bpmEl = document.getElementById('hud-bpm');
+            let current = parseInt(bpmEl.innerText);
+            let change = Math.floor(Math.random() * 5) - 2; // -2 ~ +2
+            let next = current + change;
+            if(next > 120) next = 120;
+            if(next < 60) next = 60;
+            bpmEl.innerText = next;
+            if(next > 100) bpmEl.style.color = 'red';
+            else bpmEl.style.color = 'var(--gold)';
+        }, 2000);
 
-        const grid = document.getElementById('char-grid');
-        characters.forEach(c => {
-            const div = document.createElement('div');
-            div.className = 'char-card';
-            div.onclick = () => openModal(c);
-            div.innerHTML = `
-                <div class="char-img" style="background-image: url('${c.img}')"></div>
-                <div class="char-info"><div class="c-alias">${c.alias}</div><div class="c-role">${c.role}</div></div>
-            `;
-            grid.appendChild(div);
-        });
-
-        const modal = document.getElementById('modal-overlay');
-        function openModal(c) {
-            document.getElementById('m-img').style.backgroundImage = `url('${c.img}')`;
-            document.getElementById('m-alias').innerText = c.alias;
-            document.getElementById('m-meta').innerText = c.meta;
-            document.getElementById('m-pers').innerText = c.pers;
-            document.getElementById('m-bg').innerHTML = c.bg;
-            document.getElementById('m-note').innerText = c.note;
-            modal.style.display = 'flex';
-            document.querySelectorAll('.dossier-paper .redacted').forEach(el => {
-                el.addEventListener('mouseenter', () => playSfx('hover'));
-            });
+        // 3. 로그 시스템
+        const logBox = document.getElementById('system-log');
+        function addLog(msg) {
+            const line = document.createElement('div');
+            line.className = 'log-line';
+            const time = new Date().toTimeString().split(' ')[0];
+            line.innerText = `[${time}] ${msg}`;
+            logBox.appendChild(line);
+            if(logBox.children.length > 6) {
+                logBox.removeChild(logBox.firstChild);
+            }
         }
-        function closeModal() { modal.style.display = 'none'; }
 
-        // YouTube API
         var tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
@@ -573,8 +770,7 @@
         var player;
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('youtube-player', {
-                height: '0', width: '0', 
-                videoId: YOUTUBE_ID, // ★ 위에서 설정한 ID 사용
+                height: '0', width: '0', videoId: YOUTUBE_ID,
                 playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': YOUTUBE_ID }
             });
         }
