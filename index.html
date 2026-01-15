@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Cage Dorée - MEMBER ACCESS</title>
+    <title>La Cage Dorée - SYSTEM ACCESS</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
@@ -32,38 +32,75 @@
         ::-webkit-scrollbar-thumb { background: #333; }
         ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
 
-        /* ================= STAGE 1: INTRO (LOGIN) ================= */
+        /* ================= STAGE 1: INTRO (SCANNER) ================= */
         #stage-intro {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #151515 0%, #000 80%);
+            background: radial-gradient(circle at center, #111 0%, #000 90%);
             z-index: 5000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 1s;
         }
 
+        /* 배경 그리드 효과 */
+        #stage-intro::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(255, 0, 0, 0.02), rgba(255, 0, 0, 0.06));
+            background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        .intro-status {
+            font-family: var(--sys-font); color: var(--gold); font-size: 1rem; margin-bottom: 30px;
+            letter-spacing: 3px; opacity: 0.8; text-shadow: 0 0 10px rgba(179, 139, 72, 0.5);
+        }
+
+        .envelope-wrapper { position: relative; width: 650px; max-width: 90vw; cursor: pointer; }
+
         .envelope-box {
-            width: 650px; max-width: 90vw;
-            cursor: pointer; position: relative;
+            width: 100%; display: block;
             animation: floating 4s ease-in-out infinite;
             transition: transform 0.5s, filter 0.5s;
             z-index: 10;
         }
-        .envelope-box:hover { 
-            transform: scale(1.02) translateY(-10px); 
-            filter: drop-shadow(0 0 40px rgba(179, 139, 72, 0.4));
-        }
         .envelope-box img { width: 100%; display: block; filter: drop-shadow(0 20px 30px #000); }
+        
+        /* 스캔 라인 (평소엔 숨김) */
+        .scan-line {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--gold-light);
+            box-shadow: 0 0 20px var(--gold-light);
+            opacity: 0; z-index: 20; pointer-events: none;
+        }
+
+        .intro-hint {
+            margin-top: 30px; font-family: var(--sys-font); color: #555; font-size: 0.8rem;
+            animation: pulseText 2s infinite;
+        }
+        @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
+        /* 클릭 시 애니메이션 클래스 */
+        .scanning .envelope-box { animation: shake 0.5s linear infinite; }
+        .scanning .scan-line { opacity: 1; animation: scanDown 1.5s cubic-bezier(0.45, 0, 0.55, 1) forwards; }
+        .scanning .envelope-wrapper { animation: suckIn 0.5s 1.2s forwards; } /* 스캔 후 빨려들어감 */
+
+        @keyframes scanDown { 0% { top: 0%; } 100% { top: 100%; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-2px); } 75% { transform: translateX(2px); } }
+        @keyframes suckIn { 
+            0% { transform: scale(1); filter: brightness(1); opacity: 1; }
+            100% { transform: scale(0); filter: brightness(5); opacity: 0; }
+        }
+
+        /* 패널 */
         #auth-panel {
-            opacity: 0; transform: translateY(30px); transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            opacity: 0; display: none; /* 처음엔 숨김 */
+            flex-direction: column; align-items: center; gap: 20px;
             background: var(--panel-bg);
             padding: 40px; border: 1px solid var(--gold);
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
             position: relative; margin-top: -50px; 
+            animation: panelAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        #auth-panel.active { opacity: 1; transform: translateY(0); }
+        @keyframes panelAppear { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
         .panel-title { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-bottom: 10px; letter-spacing: 2px; }
 
@@ -130,7 +167,17 @@
         .hud-label { color: #444; }
         .hud-value { color: var(--gold); font-weight: bold; }
         
-        .live-dot { width: 8px; height: 8px; background: red; border-radius: 50%; animation: blink 1s infinite; }
+        /* ★ CCTV 라이브 점: 천천히 숨쉬듯 깜빡임 ★ */
+        .live-dot { 
+            width: 8px; height: 8px; background: red; border-radius: 50%; 
+            animation: blinkSlow 2.5s infinite ease-in-out; 
+        }
+        @keyframes blinkSlow { 
+            0% { opacity: 1; box-shadow: 0 0 5px red; } 
+            50% { opacity: 0.3; box-shadow: none; } 
+            100% { opacity: 1; box-shadow: 0 0 5px red; } 
+        }
+
         .sanity-bar { width: 80px; height: 6px; background: #222; border: 1px solid #444; position: relative; }
         .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
 
@@ -174,7 +221,7 @@
             .hero h1 { font-size: 3.5rem; }
             .hero-slogan { font-size: 0.9rem; letter-spacing: 3px; }
             #system-hud { padding: 0 10px; font-size: 0.7rem; }
-            .hud-right { display: none; } /* 모바일에서 일부 숨김 */
+            .hud-right { display: none; } 
         }
 
         /* CONTENT SECTIONS */
@@ -279,13 +326,23 @@
 
     <!-- STAGE 1: INTRO -->
     <div id="stage-intro">
-        <div class="envelope-box" onclick="revealInput()">
-            <img src="https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/Generated%20Image%20January%2015%2C%202026%20-%209_30PM-Photoroom.png" alt="Invitation">
+        <!-- 상단 멘트 -->
+        <div class="intro-status" id="intro-status">ENCRYPTED SIGNAL DETECTED</div>
+        
+        <!-- 봉투 영역 -->
+        <div class="envelope-wrapper" id="envelope-wrapper" onclick="processEnvelope()">
+            <div class="scan-line"></div> <!-- 스캔 효과용 라인 -->
+            <div class="envelope-box">
+                <img src="https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/Generated%20Image%20January%2015%2C%202026%20-%209_30PM-Photoroom.png" alt="Invitation">
+            </div>
         </div>
 
+        <!-- 하단 힌트 -->
+        <div class="intro-hint" id="intro-hint">TOUCH TO DECRYPT</div>
+
+        <!-- 로그인 패널 (처음엔 숨김) -->
         <div id="auth-panel">
             <div class="panel-title">IDENTITY VERIFICATION</div>
-            <!-- 코드네임 입력으로 변경 -->
             <input type="text" class="pass-input" id="pass-input" placeholder="코드네임 입력 (Enter Codename)" autocomplete="off" maxlength="12">
             
             <div class="hold-btn-container">
@@ -412,7 +469,7 @@
 
     <script>
         const YOUTUBE_ID = "bG_UV0owkkE"; 
-        let currentUser = "GUEST"; // 유저 코드네임 저장
+        let currentUser = "GUEST"; 
 
         // 오디오 컨텍스트
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -422,6 +479,25 @@
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // 스캔 소리 (치이잉- 하는 소리)
+        function playScanSound() {
+            if (!audioCtx) initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 1.5); // 피치 상승
+            
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.linearRampToValueAtTime(0.1, now + 0.5);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 1.5);
         }
 
         function playKeySound() {
@@ -643,14 +719,29 @@
             });
         }
 
-        function revealInput() {
+        // ★ 봉투 클릭 및 스캔 애니메이션 로직 ★
+        function processEnvelope() {
             initAudio();
-            document.querySelector('.envelope-box').style.opacity = '0';
-            document.querySelector('.envelope-box').style.transform = 'translateY(-20px)';
+            playScanSound(); // 스캔 소리 재생
+            
+            const wrapper = document.getElementById('envelope-wrapper');
+            const status = document.getElementById('intro-status');
+            const hint = document.getElementById('intro-hint');
+
+            // 1. 상태 텍스트 변경
+            status.innerText = "VERIFYING ENCRYPTION KEY...";
+            status.style.color = "#fff";
+            hint.style.display = 'none';
+
+            // 2. 스캔 애니메이션 시작
+            wrapper.classList.add('scanning');
+
+            // 3. 애니메이션 후 입력창 표시
             setTimeout(() => {
-                document.querySelector('.envelope-box').style.display = 'none';
-                document.getElementById('auth-panel').classList.add('active');
-            }, 500);
+                wrapper.style.display = 'none';
+                status.style.display = 'none';
+                document.getElementById('auth-panel').style.display = 'flex';
+            }, 1600);
         }
 
         const holdBtn = document.getElementById('hold-btn');
@@ -662,12 +753,11 @@
             if (e.button && e.button !== 0) return;
             const inputVal = document.getElementById('pass-input').value.trim();
             
-            // 코드네임이 비어있으면 경고
             if(inputVal.length < 1) {
                 document.getElementById('pass-input').style.borderBottomColor = '#8b0000';
                 return;
             }
-            currentUser = inputVal; // 유저 이름 저장
+            currentUser = inputVal; 
 
             isHolding = true;
             startChargeSound();
@@ -702,10 +792,7 @@
             const trans = document.getElementById('stage-transition');
             const accessText = document.getElementById('access-text');
             
-            // ★ 승인 메시지 변경 ★
             accessText.innerHTML = `${currentUser}님,<br>승인되었습니다.<br><span>ACCESS GRANTED</span>`;
-            
-            // ★ HUD에 유저 이름 적용 ★
             document.getElementById('hud-user').innerText = currentUser.toUpperCase();
 
             trans.style.display = 'flex';
@@ -730,18 +817,15 @@
         }
 
         // --- 실시간 시스템 기능 ---
-        
-        // 1. 시계
         setInterval(() => {
             const d = new Date();
             document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
         }, 1000);
 
-        // 2. 심박수 (랜덤 변화)
         setInterval(() => {
             const bpmEl = document.getElementById('hud-bpm');
             let current = parseInt(bpmEl.innerText);
-            let change = Math.floor(Math.random() * 5) - 2; // -2 ~ +2
+            let change = Math.floor(Math.random() * 5) - 2; 
             let next = current + change;
             if(next > 120) next = 120;
             if(next < 60) next = 60;
@@ -750,7 +834,6 @@
             else bpmEl.style.color = 'var(--gold)';
         }, 2000);
 
-        // 3. 로그 시스템
         const logBox = document.getElementById('system-log');
         function addLog(msg) {
             const line = document.createElement('div');
