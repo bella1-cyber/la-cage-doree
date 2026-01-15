@@ -335,8 +335,22 @@
         }
         @keyframes modalOpen { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .modal-left { width: 45%; border-right: 1px solid #333; position: relative; overflow: hidden; }
-        .modal-main-img { width: 100%; height: 100%; background-size: cover; background-position: center; transition: 0.3s; }
+        .modal-left { width: 45%; border-right: 1px solid #333; position: relative; overflow: hidden; background: #000; }
+        
+        /* ★ 수정됨: 이미지가 잘리지 않고 전체가 다 보이도록 변경 ★ */
+        .modal-main-img { 
+            width: 100%; 
+            height: 100%; 
+            
+            /* 핵심 수정: cover -> contain (비율 유지하며 전체 표시) */
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: center;
+            
+            background-color: #050505; /* 여백은 어두운 색으로 */
+            transition: 0.3s; 
+        }
+
         .modal-right { width: 55%; padding: 50px; overflow-y: auto; display: flex; flex-direction: column; }
         .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #555; cursor: pointer; z-index: 10; }
         
