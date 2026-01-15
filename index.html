@@ -196,15 +196,35 @@
         /* HERO SECTION */
         .hero {
             height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000), url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop');
+            background: radial-gradient(circle at center, rgba(0,0,0,0.3), #000), url('https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc3.jpeg');
             background-size: cover; background-position: center; background-attachment: fixed;
             position: relative;
         }
+
+        /* ★ 수정된 슬로건: 가독성 극대화 ★ */
         .hero-slogan { 
-            font-family: 'Noto Serif KR', serif; font-size: 1.1rem; font-weight: 300; 
-            letter-spacing: 8px; color: var(--gold); margin-bottom: 15px; opacity: 0.9;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            font-family: 'Noto Serif KR', serif; 
+            font-size: 1.2rem; 
+            font-weight: 500; 
+            letter-spacing: 6px; 
+            color: var(--gold); 
+            margin-bottom: 15px; 
+            
+            /* 가독성 핵심: 테두리와 배경 */
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000, /* 글자 테두리(Stroke) 효과 */
+                 0 0 20px rgba(0,0,0,0.9); /* 강한 그림자 */
+            
+            background: rgba(0, 0, 0, 0.6); /* 글자 뒤에 반투명 검은 배경 */
+            padding: 8px 20px; /* 배경 여백 */
+            border-radius: 4px;
+            backdrop-filter: blur(2px); /* 배경 흐림 효과 */
+            border: 1px solid rgba(179, 139, 72, 0.4); /* 아주 얇은 금색 테두리 */
         }
+
         .hero h1 { 
             font-family: 'Cinzel', serif; font-weight: 900; font-size: 6rem; 
             color: var(--gold); margin: 0; line-height: 1; text-shadow: 0 10px 50px #000; 
@@ -213,10 +233,44 @@
             font-family: var(--sys-font); color: #888; font-size: 0.9rem; 
             margin-top: 20px; letter-spacing: 3px;
         }
+
+        /* ★ 수정된 스크롤 유도: 반짝임 + 움직임 강화 ★ */
         .scroll-down {
-            position: absolute; bottom: 40px; color: var(--gold); animation: bounce 2s infinite;
-            display: flex; flex-direction: column; align-items: center; gap: 5px; opacity: 0.7;
+            position: absolute; bottom: 40px; 
+            color: var(--gold); 
+            display: flex; flex-direction: column; align-items: center; gap: 5px; 
+            
+            /* 애니메이션 변경: bounce -> flashBounce */
+            animation: flashBounce 2s infinite ease-in-out;
+            cursor: pointer;
+            z-index: 20;
         }
+        
+        .scroll-down span:first-child {
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px #000;
+        }
+
+        .scroll-down span:last-child {
+            font-size: 2rem; /* 화살표 더 크게 */
+            text-shadow: 0 0 10px var(--gold); /* 화살표 자체 발광 */
+        }
+
+        /* 새로 만든 애니메이션: 위아래로 움직이면서 깜빡임 */
+        @keyframes flashBounce { 
+            0%, 100% { 
+                transform: translateY(0); 
+                opacity: 0.6; 
+                text-shadow: 0 0 5px #000;
+            } 
+            50% { 
+                transform: translateY(15px); /* 움직임 폭 증가 */
+                opacity: 1; 
+                text-shadow: 0 0 20px var(--gold), 0 0 40px var(--gold-light); /* 강한 발광 */
+            } 
+        }
+
         @media (max-width: 768px) {
             .hero h1 { font-size: 3.5rem; }
             .hero-slogan { font-size: 0.9rem; letter-spacing: 3px; }
@@ -405,7 +459,7 @@
             </div>
             
             <div class="info-grid">
-                <img src="https://via.placeholder.com/600x400/111/333?text=Club+Interior" class="info-img" alt="Club" onclick="addLog('User examined Club Interior')">
+                <img src="https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc2.jpeg" class="info-img" alt="Club" onclick="addLog('User examined Club Interior')">
                 <div class="info-text">
                     <h3>Membership Criteria</h3>
                     <ul>
@@ -588,46 +642,46 @@
 
         // --- 데이터 ---
         const rooms = [
-            { name: "흑단실 (Black Room)", img: "https://via.placeholder.com/400x300/000/333?text=Black+Room", status: "OCCUPIED", desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다." },
-            { name: "거울방 (Mirror Room)", img: "https://via.placeholder.com/400x300/111/333?text=Mirror+Room", status: "VACANT", desc: "사방이 거울로 둘러싸인 방. 자신의 쾌락과 수치를 다각도에서 관찰할 수 있습니다. 조명 조절이 가능합니다." },
-            { name: "비밀극장 (The Theater)", img: "https://via.placeholder.com/400x300/222/333?text=Theater", status: "SHOW 22:00", desc: "관음과 노출의 경계. 무대 위에서의 플레이와 그것을 지켜보는 관객석이 존재합니다. 익명성이 보장됩니다." },
-            { name: "의상실 (Dressing Room)", img: "https://via.placeholder.com/400x300/333/333?text=Dressing", status: "OPEN", desc: "다양한 코스튬과 도구가 준비된 공간. 당신의 페르소나를 완성하십시오." },
-            { name: "상담실 (The Clinic)", img: "https://via.placeholder.com/400x300/444/333?text=Clinic", status: "DR.WHITE", desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다." },
-            { name: "V.I.P Suite", img: "https://via.placeholder.com/400x300/555/333?text=VIP", status: "RESTRICTED", desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다." }
+            { name: "흑단실 (Black Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc4.jpeg", status: "OCCUPIED", desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다." },
+            { name: "거울방 (Mirror Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc5.jpeg", status: "VACANT", desc: "사방이 거울로 둘러싸인 방. 자신의 쾌락과 수치를 다각도에서 관찰할 수 있습니다. 조명 조절이 가능합니다." },
+            { name: "비밀극장 (The Theater)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc1.jpeg", status: "SHOW 22:00", desc: "관음과 노출의 경계. 무대 위에서의 플레이와 그것을 지켜보는 관객석이 존재합니다. 익명성이 보장됩니다." },
+            { name: "의상실 (Dressing Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc8.jpeg", status: "OPEN", desc: "다양한 코스튬과 도구가 준비된 공간. 당신의 페르소나를 완성하십시오." },
+            { name: "상담실 (The Clinic)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc7.jpeg", status: "DR.WHITE", desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다." },
+            { name: "V.I.P Suite", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", status: "RESTRICTED", desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다." }
         ];
 
         const characters = [
             { 
                 id: 1, alias: "OBSIDIAN", name: "차도윤", role: "DOMINANT", 
-                img: "https://via.placeholder.com/400x600/111/555?text=Obsidian+Main", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a1.jpeg", 
                 gallery: ["https://via.placeholder.com/150/111/555?text=Suit", "https://via.placeholder.com/150/111/555?text=Eyes", "https://via.placeholder.com/150/111/555?text=Hand", "https://via.placeholder.com/150/111/555?text=Shadow"],
                 meta: "차도윤 | 28세 | CL그룹 후계자", pers: "고급스러움과 냉혹함. 말수가 적고 눈빛과 행동으로 압도함.", bg: "재벌 가문 출신. <span class='redacted'>가장 위험한 도미넌트</span>로 분류됨.", note: "통제광." 
             },
             { 
                 id: 2, alias: "AURUM", name: "서율", role: "DOMINANT (SOFT)", 
-                img: "https://via.placeholder.com/400x600/222/555?text=Aurum+Main", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a2.jpeg", 
                 gallery: ["https://via.placeholder.com/150/222/555?text=Smile", "https://via.placeholder.com/150/222/555?text=Glasses", "https://via.placeholder.com/150/222/555?text=Book", "https://via.placeholder.com/150/222/555?text=Light"],
                 meta: "서율 | 27세 | 심리상담사", pers: "다정하고 상냥하지만 심리를 장악하는 데 능함.", bg: "초보자를 다루는 데 특화됨. 내면 깊은 곳엔 <span class='redacted'>강한 독점욕</span>이 숨겨져 있음.", note: "경계 요망." 
             },
             { 
                 id: 3, alias: "ECHO", name: "류이안", role: "SUBMISSIVE", 
-                img: "https://via.placeholder.com/400x600/151515/555?text=Echo+Main", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a4.jpeg", 
                 gallery: ["https://via.placeholder.com/150/151515/555?text=Stage", "https://via.placeholder.com/150/151515/555?text=Tears", "https://via.placeholder.com/150/151515/555?text=Collar", "https://via.placeholder.com/150/151515/555?text=Kneel"],
                 meta: "류이안 | 26세 | 배우", pers: "무대 위에선 빛나지만 클럽에선 복종을 갈구함.", bg: "감정이 과열되면 <span class='redacted'>위험한 집착</span>으로 돌변할 수 있음.", note: "애정 결핍." 
             },
             {
                 id: 4, alias: "GLASS", name: "노엘", role: "SWITCH",
-                img: "https://via.placeholder.com/400x600/1a1a1a/555?text=Glass+Main", gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/d.jpeg", gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
                 meta: "노엘 | 29세 | 행동 심리학자", pers: "장난기 많지만 거리감 유지. 영어를 섞어 씀.", bg: "유저를 연구 대상으로 여김. <span class='redacted'>실험적인 플레이</span>를 즐김.", note: "예측 불가."
             },
             {
                 id: 5, alias: "RENAULT", name: "르노", role: "OWNER",
-                img: "https://via.placeholder.com/400x600/0d0d0d/555?text=Renault+Main", gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/c.jpeg", gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
                 meta: "르노 | 미상 | 클럽 오너", pers: "조용하지만 사람을 꿰뚫는 통찰력.", bg: "클럽의 절대 권력자. 과거 신원 불명.", note: "접근 주의."
             },
             {
                 id: 6, alias: "WHITE MISTRESS", name: "진보라", role: "DOMINA",
-                img: "https://via.placeholder.com/400x600/202020/555?text=White+Main", gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a3.jpeg", gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
                 meta: "진보라 | 29세 | 큐레이터", pers: "냉정하고 도도함. 사람을 미술품처럼 감상.", bg: "클럽 규칙 위반자를 즉시 제재함. 과거 <span class='redacted'>차도윤의 연인</span>.", note: "규칙 엄수."
             }
         ];
