@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Cage Dorée - SECURE ACCESS</title>
+    <title>La Cage Dorée - MEMBER PROFILES</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
@@ -81,43 +81,83 @@
             100% { transform: scale(0); filter: brightness(5); opacity: 0; }
         }
 
-        /* 패널 */
+        /* 패널 (디자인 개선됨) */
         #auth-panel {
             opacity: 0; display: none;
-            flex-direction: column; align-items: center; gap: 20px;
+            flex-direction: column; align-items: center; gap: 25px;
             background: var(--panel-bg);
-            padding: 40px 20px; border: 1px solid var(--gold);
+            padding: 50px 30px; 
+            border: 1px solid #333;
+            border-top: 2px solid var(--gold);
+            border-bottom: 2px solid var(--gold);
             box-shadow: 0 0 80px rgba(0,0,0,0.9);
             position: relative; margin-top: -50px; 
             animation: panelAppear 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            width: 90%; max-width: 400px;
+            width: 90%; max-width: 420px;
         }
         @keyframes panelAppear { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .panel-title { font-family: 'Cinzel'; color: var(--gold); font-size: 1.1rem; margin-bottom: 5px; letter-spacing: 1px; text-align: center; }
-
-        .pass-input {
-            background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid #333;
-            color: var(--gold); font-family: 'Noto Serif KR'; font-weight: 700;
-            font-size: 1.2rem; text-align: center; padding: 10px; width: 100%; outline: none;
-            transition: 0.3s; border-radius: 0;
+        .panel-header {
+            width: 100%; text-align: center; border-bottom: 1px solid #222; padding-bottom: 15px; margin-bottom: 10px;
         }
-        .pass-input:focus { border-bottom-color: var(--gold); }
+        .panel-title { 
+            font-family: var(--sys-font); color: var(--gold); font-size: 1rem; 
+            letter-spacing: 3px; text-transform: uppercase;
+        }
+        .panel-sub { font-family: var(--sys-font); color: #444; font-size: 0.7rem; margin-top: 5px; }
 
-        /* 지문 인식 스캐너 */
-        .fingerprint-wrapper { text-align: center; margin-top: 10px; }
-        .fingerprint-text { font-family: 'Noto Serif KR'; font-size: 0.85rem; color: #888; margin-bottom: 10px; display: block; }
+        /* 인풋창 터미널 스타일 (색상 수정됨) */
+        .input-group {
+            position: relative; width: 100%; display: flex; align-items: center;
+            border-bottom: 2px solid #333; transition: 0.3s;
+        }
+        .input-prefix { color: #666; font-family: var(--sys-font); font-size: 1.2rem; margin-right: 10px; animation: blink 1s infinite; }
         
+        .pass-input {
+            background: transparent; border: none;
+            color: var(--gold); /* 금색 */
+            font-family: 'Share Tech Mono', monospace; 
+            font-weight: bold; 
+            font-size: 1.3rem; width: 100%; outline: none;
+            padding: 10px 0; letter-spacing: 2px; text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(179, 139, 72, 0.3);
+        }
+        .pass-input::placeholder { color: #333; font-family: var(--sys-font); letter-spacing: 1px; font-weight: normal; text-shadow: none; }
+        .input-group:focus-within { border-bottom-color: var(--gold); }
+        .input-group:focus-within .input-prefix { color: var(--gold); }
+
+        /* 지문 인식 스캐너 (개선됨) */
+        .fingerprint-wrapper { 
+            text-align: center; margin-top: 15px; width: 100%;
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        .fingerprint-text { 
+            font-family: var(--sys-font); font-size: 0.75rem; color: #666; margin-bottom: 20px; 
+            letter-spacing: 1px; display: flex; align-items: center; gap: 5px;
+        }
+        .blink-cursor { display: inline-block; width: 6px; height: 12px; background: var(--gold); animation: blink 1s infinite; }
+
         .fingerprint-container {
-            position: relative; width: 90px; height: 90px; margin: 0 auto;
+            position: relative; width: 100px; height: 100px; 
             display: flex; justify-content: center; align-items: center;
             cursor: pointer;
-            border-radius: 50%; border: 1px solid #333;
-            transition: 0.3s; background: radial-gradient(circle, #151515 0%, #050505 70%);
+            border-radius: 50%; 
+            background: radial-gradient(circle, #1a1a1a 0%, #000 70%);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .fingerprint-container:active { transform: scale(0.95); border-color: var(--gold); }
         
-        .fingerprint-icon { width: 50px; height: 50px; fill: #444; transition: 0.3s; }
+        /* 회전하는 링 효과 */
+        .fp-ring {
+            position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%; border: 1px dashed #333;
+            animation: spinSlow 10s linear infinite; pointer-events: none;
+        }
+        .fp-ring::before {
+            content: ''; position: absolute; top: -2px; left: 50%; width: 4px; height: 4px;
+            background: var(--gold); box-shadow: 0 0 10px var(--gold); border-radius: 50%;
+        }
+        
+        .fingerprint-icon { width: 55px; height: 55px; fill: #333; transition: 0.3s; opacity: 0.7; }
         
         .scan-beam {
             position: absolute; top: 0; left: 0; width: 100%; height: 2px;
@@ -125,11 +165,17 @@
             opacity: 0; pointer-events: none;
         }
         
+        .fingerprint-container:hover .fingerprint-icon { fill: #555; opacity: 1; }
         .fingerprint-container.scanning .fingerprint-icon { fill: #665c4a; }
-        .fingerprint-container.scanning .scan-beam { opacity: 1; animation: beamScan 1.5s infinite linear; }
-        .fingerprint-container.success { border-color: var(--gold); box-shadow: 0 0 30px var(--gold); }
+        .fingerprint-container.scanning .scan-beam { opacity: 1; animation: beamScan 1.2s infinite linear; }
+        .fingerprint-container.scanning .fp-ring { border-color: var(--gold-light); animation-duration: 2s; }
+        
+        .fingerprint-container.success { box-shadow: 0 0 40px var(--gold); }
         .fingerprint-container.success .fingerprint-icon { fill: var(--gold); animation: pulseGold 1s infinite; }
+        .fingerprint-container.success .fp-ring { border-style: solid; border-color: var(--gold); }
 
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes spinSlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes beamScan { 0% { top: 10%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { top: 90%; opacity: 0; } }
         @keyframes pulseGold { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
@@ -175,19 +221,16 @@
         .sanity-bar { width: 60px; height: 5px; background: #222; border: 1px solid #444; position: relative; }
         .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
 
-        /* ★ 시스템 로그: 모바일에서는 숨김 (겹침 방지) ★ */
+        /* 시스템 로그 (PC만) */
         #system-log {
-            display: none; /* 기본 숨김 */
+            display: none;
             position: fixed; bottom: 20px; right: 20px; width: 300px; height: 150px;
             background: rgba(0,0,0,0.8); border: 1px solid #333;
             z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.7rem;
             color: #555; overflow: hidden; pointer-events: none;
             flex-direction: column; justify-content: flex-end;
         }
-        /* PC에서만 보이게 */
-        @media (min-width: 900px) {
-            #system-log { display: flex; }
-        }
+        @media (min-width: 900px) { #system-log { display: flex; } }
         .log-line { margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
         .log-line:last-child { color: var(--gold); animation: flash 0.5s; }
 
@@ -216,12 +259,10 @@
             margin-top: 20px; letter-spacing: 2px;
         }
 
-        /* ★ 스크롤 버튼 수정: 무조건 보이게 ★ */
         .scroll-down {
             position: absolute; bottom: 40px; color: var(--gold); 
             display: flex; flex-direction: column; align-items: center; gap: 5px; 
             animation: flashBounce 2s infinite ease-in-out; cursor: pointer; z-index: 50;
-            /* 배경 추가해서 가독성 확보 */
             background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 30px;
             border: 1px solid rgba(179, 139, 72, 0.5); backdrop-filter: blur(5px);
         }
@@ -237,14 +278,13 @@
         .sec-title { font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); margin-bottom: 10px; }
         .sec-desc { color: #888; font-size: 0.9rem; line-height: 1.6; word-break: keep-all; }
 
-        /* ★ 정보 그리드 (모바일 우선: 세로 배치) ★ */
+        /* 정보 그리드 */
         .info-grid { display: flex; flex-direction: column; gap: 30px; align-items: center; }
         .info-img { width: 100%; height: 250px; background: #111; border: 1px solid #333; object-fit: cover; filter: grayscale(50%); transition: 0.5s; cursor: pointer;}
         .info-text { width: 100%; }
         .info-text h3 { color: var(--gold); font-family: 'Cinzel'; font-size: 1.3rem; margin-bottom: 15px; border-left: 3px solid var(--gold); padding-left: 10px; }
         .info-text p { color: #ccc; line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; }
         
-        /* PC 대응 (900px 이상일 때 가로 배치) */
         @media (min-width: 900px) {
             .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
             .info-img { height: 400px; }
@@ -259,10 +299,31 @@
         .room-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: linear-gradient(to top, #000, transparent); }
         .room-name { font-family: 'Cinzel'; font-size: 1.2rem; color: #fff; }
 
+        /* 캐릭터 카드 스타일 수정 */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .char-card { background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
+        .char-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        
         .char-img { width: 100%; height: 350px; background-size: cover; background-position: top center; filter: grayscale(100%); transition: 0.5s; }
         .char-card:hover .char-img { filter: grayscale(0%); }
+
+        /* ★ 텍스트 색상 분리 및 디자인 ★ */
+        .char-info { padding: 15px 20px; border-top: 1px solid #111; }
+        .c-alias { 
+            font-family: 'Cinzel', serif; 
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            color: var(--gold); /* 이름은 금색 */
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+        .c-role { 
+            font-family: var(--sys-font); 
+            font-size: 0.85rem; 
+            color: #777; /* 역할은 차분한 회색 */
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+        }
 
         /* 모달 반응형 */
         #modal-overlay {
@@ -273,7 +334,7 @@
         .modal-box {
             width: 100%; max-width: 900px; height: 90vh; background: #0e0e0e;
             border: 1px solid var(--gold); display: flex; 
-            flex-direction: column; /* 모바일: 세로 */
+            flex-direction: column;
             box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative;
             animation: modalOpen 0.3s ease-out;
         }
@@ -307,14 +368,27 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; }
         .gallery-thumb { height: 60px; background-size: cover; background-position: center; border: 1px solid #333; filter: grayscale(100%); }
 
-        .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; }
+        /* ★ 모달 내부 타이포그래피 ★ */
+        .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; display: inline-block; }
         .m-title { font-family: 'Cinzel'; font-size: 2rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
-        .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 20px; font-size: 0.8rem; }
-        .m-section { margin-bottom: 20px; }
-        .m-label { font-family: var(--sys-font); color: var(--gold); font-size: 0.7rem; display: block; margin-bottom: 5px; border-bottom: 1px solid #333; padding-bottom: 3px; }
-        .m-text { font-size: 0.95rem; line-height: 1.6; color: #ccc; white-space: pre-line; word-break: keep-all; }
+        .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 15px; font-size: 0.8rem; }
+        .m-quote { 
+            font-family: 'Noto Serif KR'; color: var(--gold-light); font-style: italic; 
+            margin-bottom: 25px; padding: 10px 0; border-top: 1px solid #222; border-bottom: 1px solid #222;
+            font-size: 0.95rem; text-align: center;
+        }
+        
+        /* 프로필 상세 항목 (간결화) */
+        .m-info-row { display: flex; margin-bottom: 8px; font-size: 0.9rem; align-items: flex-start; }
+        .m-info-label { color: var(--gold); font-family: var(--sys-font); width: 80px; flex-shrink: 0; opacity: 0.8; }
+        .m-info-value { color: #ccc; line-height: 1.4; }
+        
+        .m-tags { margin: 15px 0; display: flex; flex-wrap: wrap; gap: 5px; }
+        .m-tag { 
+            background: #111; border: 1px solid #333; padding: 4px 8px; 
+            font-size: 0.75rem; color: #888; border-radius: 4px; font-family: var(--sys-font);
+        }
 
-        /* ★ 검열된 텍스트 (모바일 터치 대응) ★ */
         .redacted { 
             background: #000; color: #000; padding: 0 3px; border: 1px solid #333; 
             cursor: pointer; transition: 0.3s; position: relative; display: inline-block;
@@ -323,13 +397,11 @@
             content: 'RESTRICTED'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; justify-content: center; align-items: center; color: #333; font-size: 0.5rem; pointer-events: none;
         }
-        /* 호버(PC) 또는 클래스 추가(모바일) 시 보임 */
         .redacted:hover, .redacted.revealed { 
             background: transparent; color: var(--gold-light); border-color: var(--gold); 
         }
         .redacted:hover::after, .redacted.revealed::after { content: ''; }
 
-        /* 라이트박스 */
         #lightbox-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,1); z-index: 11000; display: none;
@@ -339,9 +411,7 @@
 
         footer { text-align: center; padding: 50px 0; color: #444; font-family: var(--sys-font); font-size: 0.7rem; border-top: 1px solid #222; }
 
-        @media (max-width: 768px) {
-            .hud-right { display: none; }
-        }
+        @media (max-width: 768px) { .hud-right { display: none; } }
 
     </style>
 </head>
@@ -360,13 +430,22 @@
         <div class="intro-hint" id="intro-hint">TOUCH TO DECRYPT</div>
 
         <div id="auth-panel">
-            <div class="panel-title">IDENTITY VERIFICATION</div>
-            <input type="text" class="pass-input" id="pass-input" placeholder="CODE NAME" autocomplete="off" maxlength="12">
+            <div class="panel-header">
+                <div class="panel-title">IDENTITY VERIFICATION</div>
+                <div class="panel-sub">SECURE SERVER ACCESS REQUEST</div>
+            </div>
             
-            <!-- ★ 지문 인식 안내 문구 추가 ★ -->
+            <div class="input-group">
+                <span class="input-prefix">></span>
+                <input type="text" class="pass-input" id="pass-input" placeholder="ENTER CODENAME" autocomplete="off" maxlength="12">
+            </div>
+            
             <div class="fingerprint-wrapper">
-                <span class="fingerprint-text">지문을 스캔하여 접속 (Scan Fingerprint)</span>
+                <div class="fingerprint-text">
+                    AWAITING BIOMETRIC INPUT <span class="blink-cursor"></span>
+                </div>
                 <div class="fingerprint-container" id="fp-scanner">
+                    <div class="fp-ring"></div>
                     <div class="scan-beam"></div>
                     <svg class="fingerprint-icon" viewBox="0 0 24 24">
                         <path d="M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 2.72 12.01 2.72c-1.31 0-2.6.32-3.79.93-.95.49-1.52 1.37-1.52 2.35 0 .81.38 1.56 1.05 2.05.37.27.88.29 1.28.05.65-.39 1.15-.92 1.15-1.66 0-.31.18-.59.48-.74.37-.19.78-.29 1.2-.29 1.63 0 3.06.96 3.66 2.44.13.33.45.54.8.54.12 0 .24-.02.36-.07.47-.19.7-.72.51-1.19-.71-1.75-2.42-2.89-4.32-2.89-1.92 0-3.66 1.16-4.36 2.91-.07.17-.11.36-.11.55 0 .97.58 1.84 1.48 2.22.46.2 1 .01 1.22-.43.15-.3.12-.66-.08-.94-.37-.52-.57-1.13-.57-1.78 0-.58.34-1.1.86-1.36.19-.1.39-.14.6-.14.65 0 1.22.36 1.5 .95.53 1.11.8 2.33.8 3.59 0 1.94-.78 3.76-2.14 5.12-1.36 1.36-3.17 2.11-5.11 2.11-1.26 0-2.48-.27-3.59-.8-.44-.21-.97-.02-1.18.42-.21.44-.02.97.42 1.18 1.34.64 2.81.96 4.35.96 2.34 0 4.54-.91 6.18-2.55 1.64-1.64 2.55-3.83 2.55-6.18 0-1.51-.32-2.98-.96-4.33-.2-.43-.73-.61-1.16-.41z"/>
@@ -394,7 +473,6 @@
             </div>
         </div>
 
-        <!-- 로그창 -->
         <div id="system-log">
             <div class="log-line">[SYSTEM] Initializing connection...</div>
         </div>
@@ -591,39 +669,91 @@
             { name: "V.I.P Suite", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", status: "RESTRICTED", desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다." }
         ];
 
+        // ★ 업데이트된 캐릭터 데이터 (역할 간소화 & GLASS 수정됨) ★
         const characters = [
             { 
-                id: 1, alias: "OBSIDIAN", name: "차도윤", role: "DOMINANT", 
+                id: 1, 
+                alias: "OBSIDIAN", 
+                name: "차도윤 (Cha Doyun)", 
+                role: "Dominant",  
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a1.jpeg", 
-                gallery: ["https://via.placeholder.com/150/111/555?text=Suit", "https://via.placeholder.com/150/111/555?text=Eyes", "https://via.placeholder.com/150/111/555?text=Hand", "https://via.placeholder.com/150/111/555?text=Shadow"],
-                meta: "차도윤 | 28세 | CL그룹 후계자", pers: "고급스러움과 냉혹함. 말수가 적고 눈빛과 행동으로 압도함.", bg: "재벌 가문 출신. <span class='redacted'>가장 위험한 도미넌트</span>로 분류됨.", note: "통제광." 
+                gallery: ["https://via.placeholder.com/150/111/555?text=Suit", "https://via.placeholder.com/150/111/555?text=RedEyes", "https://via.placeholder.com/150/111/555?text=Crop", "https://via.placeholder.com/150/111/555?text=Glove"],
+                meta: "38세 | CL그룹 후계자",
+                quote: "\"내 허락 없이는 숨도 쉬지 마.\"",
+                tags: ["#ENTJ", "#Tyrant", "#Perfectionist"],
+                appearance: "192cm / 근육질 / 올백머리 / 적안(Red Eyes)",
+                mask: "빛을 흡수하는 무광 검정 기하학 마스크",
+                play: "Tool Play, Breath Control, Verbal Domination"
             },
             { 
-                id: 2, alias: "AURUM", name: "서율", role: "DOMINANT (SOFT)", 
+                id: 2, 
+                alias: "AURUM", 
+                name: "서율 (Seo Yul)", 
+                role: "Dominant", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a2.jpeg", 
                 gallery: ["https://via.placeholder.com/150/222/555?text=Smile", "https://via.placeholder.com/150/222/555?text=Glasses", "https://via.placeholder.com/150/222/555?text=Book", "https://via.placeholder.com/150/222/555?text=Light"],
-                meta: "서율 | 27세 | 심리상담사", pers: "다정하고 상냥하지만 심리를 장악하는 데 능함.", bg: "초보자를 다루는 데 특화됨. 내면 깊은 곳엔 <span class='redacted'>강한 독점욕</span>이 숨겨져 있음.", note: "경계 요망." 
+                meta: "32세 | VIP 웰니스 센터 대표",
+                quote: "\"괜찮아요. 여기선 다 내려놓고... 제게 맡기세요.\"",
+                tags: ["#ENFJ", "#Gaslighter", "#Possessive"],
+                appearance: "183cm / 부드러운 웨이브 / 웜톤 / 댄디룩",
+                mask: "금색 실로 장식된 섬세한 필리그리(Filigree)",
+                play: "Medical Play, Orgasm Control, Hypno"
             },
             { 
-                id: 3, alias: "ECHO", name: "류이안", role: "SUBMISSIVE", 
+                id: 3, 
+                alias: "ECHO", 
+                name: "류이안 (Ryu Ian)", 
+                role: "Submissive", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a4.jpeg", 
                 gallery: ["https://via.placeholder.com/150/151515/555?text=Stage", "https://via.placeholder.com/150/151515/555?text=Tears", "https://via.placeholder.com/150/151515/555?text=Collar", "https://via.placeholder.com/150/151515/555?text=Kneel"],
-                meta: "류이안 | 26세 | 배우", pers: "무대 위에선 빛나지만 클럽에선 복종을 갈구함.", bg: "감정이 과열되면 <span class='redacted'>위험한 집착</span>으로 돌변할 수 있음.", note: "애정 결핍." 
+                meta: "28세 | 천만 배우 & 톱 아이돌",
+                quote: "\"주인님... 저 예뻐해 주세요. 멍멍, 짖으면 봐주실 거예요?\"",
+                tags: ["#ISFP", "#AttentionSeeker", "#Masochist"],
+                appearance: "178cm / 퇴폐미 / 헝클어진 흑발 / 눈물점",
+                mask: "깨지기 쉬운 하얀 도자기 재질",
+                play: "Pet Play, Spanking, Voyeurism"
             },
             {
-                id: 4, alias: "GLASS", name: "노엘", role: "SWITCH",
-                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/d.jpeg", gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
-                meta: "노엘 | 29세 | 행동 심리학자", pers: "장난기 많지만 거리감 유지. 영어를 섞어 씀.", bg: "유저를 연구 대상으로 여김. <span class='redacted'>실험적인 플레이</span>를 즐김.", note: "예측 불가."
+                id: 4, 
+                alias: "GLASS", 
+                name: "노엘 (Noel)", 
+                role: "Switch", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/d.jpeg", 
+                gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
+                meta: "33세 | 행동 심리학 교수",
+                quote: "\"Oops, 아팠어? Sorry, darling. 반응이 너무 예뻐서 그만.\"",
+                tags: ["#ENTP", "#Hedonist", "#Fox"],
+                appearance: "181cm / 은발 쉼표 머리 / 보라색 눈 / 하네스",
+                mask: "투명한 크리스탈 장식 가면",
+                play: "Temperature, Electro Play, Teasing"
             },
             {
-                id: 5, alias: "RENAULT", name: "르노", role: "OWNER",
-                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/c.jpeg", gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
-                meta: "르노 | 미상 | 클럽 오너", pers: "조용하지만 사람을 꿰뚫는 통찰력.", bg: "클럽의 절대 권력자. 과거 신원 불명.", note: "접근 주의."
+                id: 5, 
+                alias: "RENAULT", 
+                name: "르노 (Renault)", 
+                role: "Owner", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/c.jpeg", 
+                gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
+                meta: "40대 초반 | 클럽 오너 & 자산가",
+                quote: "\"이곳의 규칙은 제가 만듭니다. 그리고 저는, 규칙 위에 존재하죠.\"",
+                tags: ["#INTJ", "#Phantom", "#Noir"],
+                appearance: "185cm / 거대한 체구 / 올백 흑발 / 턱시도",
+                mask: "얼굴 반쪽을 가리는 검은색 하프 마스크",
+                play: "Voyeurism, Noir Roleplay, Fear Play"
             },
             {
-                id: 6, alias: "WHITE MISTRESS", name: "진보라", role: "DOMINA",
-                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a3.jpeg", gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
-                meta: "진보라 | 29세 | 큐레이터", pers: "냉정하고 도도함. 사람을 미술품처럼 감상.", bg: "클럽 규칙 위반자를 즉시 제재함. 과거 <span class='redacted'>차도윤의 연인</span>.", note: "규칙 엄수."
+                id: 6, 
+                alias: "WHITE MISTRESS", 
+                name: "진보라 (Jin Bora)", 
+                role: "Dominant", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a3.jpeg", 
+                gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
+                meta: "36세 | 아트 센터 관장",
+                quote: "\"아름답게 울어봐. 캔버스에 물감을 뿌리듯이.\"",
+                tags: ["#ESTJ", "#Queen", "#Aesthetic"],
+                appearance: "172cm / 백금발 / 벽안 / 킬힐 & 가죽 드레스",
+                mask: "우아한 흰색 레이스와 깃털 장식",
+                play: "Human Furniture, Trampling, Aesthetic"
             }
         ];
 
@@ -686,12 +816,41 @@
             setModalImage(c.img);
             mStamp.innerText = "TOP SECRET";
             mStamp.style.color = "#8b0000"; mStamp.style.borderColor = "#8b0000";
-            mTitle.innerText = c.alias;
-            mSub.innerText = c.meta;
+            
+            // 이름 뒤에 실명은 작게 표시하거나, 역할 강조
+            mTitle.innerHTML = `${c.alias} <span style="font-size:0.5em; color:#555; vertical-align:middle;">${c.name.split('(')[0]}</span>`;
+            mSub.innerText = c.role; 
+            
+            // 태그 생성
+            let tagsHtml = '<div class="m-tags">';
+            c.tags.forEach(t => { tagsHtml += `<span class="m-tag">${t}</span>`; });
+            tagsHtml += '</div>';
+
             mContent.innerHTML = `
-                <div class="m-section"><span class="m-label">PERSONALITY</span><p class="m-text">${c.pers}</p></div>
-                <div class="m-section"><span class="m-label">BACKGROUND</span><p class="m-text">${c.bg}</p></div>
-                <div class="m-section"><span class="m-label">NOTES</span><p class="m-text" style="color:#888; font-style:italic;">${c.note}</p></div>
+                <div class="m-quote">${c.quote}</div>
+                
+                <div class="m-info-row">
+                    <div class="m-info-label">IDENTITY</div>
+                    <div class="m-info-value">${c.meta}</div>
+                </div>
+
+                <div class="m-info-row">
+                    <div class="m-info-label">VISUAL</div>
+                    <div class="m-info-value">
+                        ${c.appearance}<br>
+                        <span style="color:#666; font-size:0.8em;">[MASK] ${c.mask}</span>
+                    </div>
+                </div>
+                
+                <div class="m-info-row">
+                    <div class="m-info-label">STYLE</div>
+                    <div class="m-info-value">${tagsHtml}</div>
+                </div>
+
+                <div class="m-info-row">
+                    <div class="m-info-label">PLAY</div>
+                    <div class="m-info-value" style="color:#e6c88b;">${c.play}</div>
+                </div>
             `;
             mGallery.innerHTML = '';
             mGallery.style.display = 'grid';
