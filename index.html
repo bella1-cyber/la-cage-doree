@@ -106,25 +106,24 @@
         }
         .panel-sub { font-family: var(--sys-font); color: #444; font-size: 0.7rem; margin-top: 5px; }
 
-        /* 인풋창 터미널 스타일 (색상 수정됨) */
+        /* 인풋창 스타일 (중앙 정렬 수정됨) */
         .input-group {
-            position: relative; width: 100%; display: flex; align-items: center;
+            position: relative; width: 100%; display: flex; justify-content: center; /* 중앙 정렬 */
             border-bottom: 2px solid #333; transition: 0.3s;
         }
-        .input-prefix { color: #666; font-family: var(--sys-font); font-size: 1.2rem; margin-right: 10px; animation: blink 1s infinite; }
         
         .pass-input {
             background: transparent; border: none;
             color: var(--gold); /* 금색 */
             font-family: 'Share Tech Mono', monospace; 
             font-weight: bold; 
-            font-size: 1.3rem; width: 100%; outline: none;
-            padding: 10px 0; letter-spacing: 2px; text-transform: uppercase;
+            font-size: 1.5rem; width: 100%; outline: none;
+            padding: 10px 0; letter-spacing: 3px; text-transform: uppercase;
             text-shadow: 0 0 10px rgba(179, 139, 72, 0.3);
+            text-align: center; /* 텍스트 중앙 정렬 */
         }
-        .pass-input::placeholder { color: #333; font-family: var(--sys-font); letter-spacing: 1px; font-weight: normal; text-shadow: none; }
+        .pass-input::placeholder { color: #333; font-family: var(--sys-font); letter-spacing: 1px; font-weight: normal; text-shadow: none; font-size: 1rem;}
         .input-group:focus-within { border-bottom-color: var(--gold); }
-        .input-group:focus-within .input-prefix { color: var(--gold); }
 
         /* 지문 인식 스캐너 (개선됨) */
         .fingerprint-wrapper { 
@@ -389,6 +388,29 @@
             font-size: 0.75rem; color: #888; border-radius: 4px; font-family: var(--sys-font);
         }
 
+        /* ★ 모달 내부: 시설 스펙 그리드 ★ */
+        .facility-specs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            margin: 20px 0; padding: 15px;
+            border: 1px solid #222; background: rgba(0,0,0,0.3);
+        }
+        .spec-item { display: flex; flex-direction: column; gap: 5px; }
+        .spec-label { font-family: var(--sys-font); font-size: 0.7rem; color: #666; }
+        .spec-value { font-family: 'Share Tech Mono'; color: var(--gold-light); font-size: 1rem; letter-spacing: 1px; }
+
+        /* ★ 모달 내부: 액션 버튼들 ★ */
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .action-btn {
+            flex: 1; padding: 12px; background: transparent;
+            border: 1px solid #333; color: #888;
+            font-family: var(--sys-font); font-size: 0.8rem; cursor: pointer;
+            transition: 0.3s; text-align: center;
+        }
+        .action-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(179, 139, 72, 0.1); }
+
+        /* ★ 텍스트 디코딩 효과용 클래스 ★ */
+        .decode-text { display: inline-block; min-height: 1.2em; }
+
         .redacted { 
             background: #000; color: #000; padding: 0 3px; border: 1px solid #333; 
             cursor: pointer; transition: 0.3s; position: relative; display: inline-block;
@@ -436,7 +458,6 @@
             </div>
             
             <div class="input-group">
-                <span class="input-prefix">></span>
                 <input type="text" class="pass-input" id="pass-input" placeholder="ENTER CODENAME" autocomplete="off" maxlength="12">
             </div>
             
@@ -661,12 +682,48 @@
 
         // --- 데이터 ---
         const rooms = [
-            { name: "흑단실 (Black Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc4.jpeg", status: "OCCUPIED", desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다." },
-            { name: "거울방 (Mirror Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc5.jpeg", status: "VACANT", desc: "사방이 거울로 둘러싸인 방. 자신의 쾌락과 수치를 다각도에서 관찰할 수 있습니다. 조명 조절이 가능합니다." },
-            { name: "비밀극장 (The Theater)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc1.jpeg", status: "SHOW 22:00", desc: "관음과 노출의 경계. 무대 위에서의 플레이와 그것을 지켜보는 관객석이 존재합니다. 익명성이 보장됩니다." },
-            { name: "의상실 (Dressing Room)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc8.jpeg", status: "OPEN", desc: "다양한 코스튬과 도구가 준비된 공간. 당신의 페르소나를 완성하십시오." },
-            { name: "상담실 (The Clinic)", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc7.jpeg", status: "DR.WHITE", desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다." },
-            { name: "V.I.P Suite", img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", status: "RESTRICTED", desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다." }
+            { 
+                name: "흑단실 (Black Room)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc4.jpeg", 
+                status: "OCCUPIED", 
+                desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다.",
+                specs: { temp: "21.5°C", sound: "100% (Abs)", security: "Lv.5", capacity: "2 Max" }
+            },
+            { 
+                name: "거울방 (Mirror Room)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc5.jpeg", 
+                status: "VACANT", 
+                desc: "사방이 거울로 둘러싸인 방. 자신의 쾌락과 수치를 다각도에서 관찰할 수 있습니다. 조명 조절이 가능합니다.",
+                specs: { temp: "23.0°C", sound: "90% (Std)", security: "Lv.3", capacity: "4 Max" }
+            },
+            { 
+                name: "비밀극장 (The Theater)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc1.jpeg", 
+                status: "SHOW 22:00", 
+                desc: "관음과 노출의 경계. 무대 위에서의 플레이와 그것을 지켜보는 관객석이 존재합니다. 익명성이 보장됩니다.",
+                specs: { temp: "20.0°C", sound: "Open", security: "Lv.2", capacity: "20 Max" }
+            },
+            { 
+                name: "의상실 (Dressing Room)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc8.jpeg", 
+                status: "OPEN", 
+                desc: "다양한 코스튬과 도구가 준비된 공간. 당신의 페르소나를 완성하십시오.",
+                specs: { temp: "24.0°C", sound: "N/A", security: "Lv.1", capacity: "Public" }
+            },
+            { 
+                name: "상담실 (The Clinic)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc7.jpeg", 
+                status: "DR.WHITE", 
+                desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다.",
+                specs: { temp: "18.0°C", sound: "95% (High)", security: "Lv.4", capacity: "3 Max" }
+            },
+            { 
+                name: "V.I.P Suite", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", 
+                status: "RESTRICTED", 
+                desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다.",
+                specs: { temp: "25.0°C", sound: "100% (Abs)", security: "Lv.MAX", capacity: "Private" }
+            }
         ];
 
         // ★ 업데이트된 캐릭터 데이터 (역할 간소화 & GLASS 수정됨) ★
@@ -675,7 +732,7 @@
                 id: 1, 
                 alias: "OBSIDIAN", 
                 name: "차도윤 (Cha Doyun)", 
-                role: "Dominant",  
+                role: "Dominant",  // 간소화됨
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a1.jpeg", 
                 gallery: ["https://via.placeholder.com/150/111/555?text=Suit", "https://via.placeholder.com/150/111/555?text=RedEyes", "https://via.placeholder.com/150/111/555?text=Crop", "https://via.placeholder.com/150/111/555?text=Glove"],
                 meta: "38세 | CL그룹 후계자",
@@ -689,7 +746,7 @@
                 id: 2, 
                 alias: "AURUM", 
                 name: "서율 (Seo Yul)", 
-                role: "Dominant", 
+                role: "Dominant", // 간소화됨
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a2.jpeg", 
                 gallery: ["https://via.placeholder.com/150/222/555?text=Smile", "https://via.placeholder.com/150/222/555?text=Glasses", "https://via.placeholder.com/150/222/555?text=Book", "https://via.placeholder.com/150/222/555?text=Light"],
                 meta: "32세 | VIP 웰니스 센터 대표",
@@ -703,7 +760,7 @@
                 id: 3, 
                 alias: "ECHO", 
                 name: "류이안 (Ryu Ian)", 
-                role: "Submissive", 
+                role: "Submissive", // 간소화됨
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a4.jpeg", 
                 gallery: ["https://via.placeholder.com/150/151515/555?text=Stage", "https://via.placeholder.com/150/151515/555?text=Tears", "https://via.placeholder.com/150/151515/555?text=Collar", "https://via.placeholder.com/150/151515/555?text=Kneel"],
                 meta: "28세 | 천만 배우 & 톱 아이돌",
@@ -717,7 +774,7 @@
                 id: 4, 
                 alias: "GLASS", 
                 name: "노엘 (Noel)", 
-                role: "Switch", 
+                role: "Switch", // ★ 수정됨: Mad Scientist 제거 ★
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/d.jpeg", 
                 gallery: ["https://via.placeholder.com/150/1a1a1a/555?text=Lab", "https://via.placeholder.com/150/1a1a1a/555?text=Notes", "https://via.placeholder.com/150/1a1a1a/555?text=Toy", "https://via.placeholder.com/150/1a1a1a/555?text=Wink"],
                 meta: "33세 | 행동 심리학 교수",
@@ -731,7 +788,7 @@
                 id: 5, 
                 alias: "RENAULT", 
                 name: "르노 (Renault)", 
-                role: "Owner", 
+                role: "Owner", // 간소화됨
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/c.jpeg", 
                 gallery: ["https://via.placeholder.com/150/0d0d0d/555?text=Cigar", "https://via.placeholder.com/150/0d0d0d/555?text=Silhouette", "https://via.placeholder.com/150/0d0d0d/555?text=Office", "https://via.placeholder.com/150/0d0d0d/555?text=Ring"],
                 meta: "40대 초반 | 클럽 오너 & 자산가",
@@ -745,7 +802,7 @@
                 id: 6, 
                 alias: "WHITE MISTRESS", 
                 name: "진보라 (Jin Bora)", 
-                role: "Dominant", 
+                role: "Dominant", // 간소화됨
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a3.jpeg", 
                 gallery: ["https://via.placeholder.com/150/202020/555?text=Heels", "https://via.placeholder.com/150/202020/555?text=Whip", "https://via.placeholder.com/150/202020/555?text=Lip", "https://via.placeholder.com/150/202020/555?text=Art"],
                 meta: "36세 | 아트 센터 관장",
@@ -800,15 +857,76 @@
             mImg.style.backgroundImage = `url('${src}')`;
         }
 
+        // ★ 텍스트 디코딩 애니메이션 함수 (새로 추가됨) ★
+        function runTextDecode(element, finalText, speed = 30) {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
+            let iterations = 0;
+            const interval = setInterval(() => {
+                element.innerText = finalText
+                    .split("")
+                    .map((letter, index) => {
+                        if (index < iterations) return finalText[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    })
+                    .join("");
+                
+                if (iterations >= finalText.length) clearInterval(interval);
+                iterations += 1 / 3; // 속도 조절
+            }, speed);
+        }
+
+        // ★ 시설 모달 열기 함수 (업데이트됨) ★
         function openRoomModal(room) {
             setModalImage(room.img);
-            mStamp.innerText = "FACILITY";
+            mStamp.innerText = "FACILITY STATUS";
             mStamp.style.color = "#ccc"; mStamp.style.borderColor = "#ccc";
-            mTitle.innerText = room.name.split(' (')[0];
-            mSub.innerText = room.status;
-            mContent.innerHTML = `<div class="m-section"><span class="m-label">DESCRIPTION</span><p class="m-text">${room.desc}</p></div>`;
+            
+            // 제목 디코딩 효과 적용
+            mTitle.innerText = ""; // 초기화
+            mTitle.classList.add('decode-text');
+            
+            mSub.innerText = `CURRENT STATUS: ${room.status}`;
+            
+            // 스펙 그리드 및 액션 버튼 추가 (휑한 느낌 제거)
+            mContent.innerHTML = `
+                <div class="m-section">
+                    <p class="m-text" style="min-height: 60px;">${room.desc}</p>
+                </div>
+
+                <div class="facility-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">TEMP / HUMIDITY</span>
+                        <span class="spec-value">${room.specs.temp} / 45%</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">SECURITY LEVEL</span>
+                        <span class="spec-value">${room.specs.security}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">SOUNDPROOF</span>
+                        <span class="spec-value">${room.specs.sound}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">CAPACITY</span>
+                        <span class="spec-value">${room.specs.capacity}</span>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="addLog('System Check requested for ${room.name}'); playKeySound();">SYSTEM CHECK</button>
+                    <button class="action-btn" onclick="addLog('Cleaning bot dispatched to ${room.name}'); playKeySound();">REQ. CLEANING</button>
+                </div>
+            `;
+            
             mGallery.style.display = 'none';
             modal.style.display = 'flex';
+            
+            // 모달이 뜬 후 텍스트 디코딩 실행 (소리 효과 제거됨)
+            setTimeout(() => {
+                runTextDecode(mTitle, room.name.split(' (')[0]);
+                // playScanSound(); // <--- 소리 제거 완료!
+            }, 100);
+
             attachRedactedEvent();
         }
 
