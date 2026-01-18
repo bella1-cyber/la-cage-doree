@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Cage Dorée - MEMBER PROFILES</title>
+    <title>La Cage Dorée - SYSTEM V2.0</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
@@ -81,7 +81,7 @@
             100% { transform: scale(0); filter: brightness(5); opacity: 0; }
         }
 
-        /* 패널 (디자인 개선됨) */
+        /* 패널 */
         #auth-panel {
             opacity: 0; display: none;
             flex-direction: column; align-items: center; gap: 25px;
@@ -106,26 +106,25 @@
         }
         .panel-sub { font-family: var(--sys-font); color: #444; font-size: 0.7rem; margin-top: 5px; }
 
-        /* 인풋창 스타일 (중앙 정렬 수정됨) */
         .input-group {
-            position: relative; width: 100%; display: flex; justify-content: center; /* 중앙 정렬 */
+            position: relative; width: 100%; display: flex; justify-content: center;
             border-bottom: 2px solid #333; transition: 0.3s;
         }
         
         .pass-input {
             background: transparent; border: none;
-            color: var(--gold); /* 금색 */
+            color: var(--gold);
             font-family: 'Share Tech Mono', monospace; 
             font-weight: bold; 
             font-size: 1.5rem; width: 100%; outline: none;
             padding: 10px 0; letter-spacing: 3px; text-transform: uppercase;
             text-shadow: 0 0 10px rgba(179, 139, 72, 0.3);
-            text-align: center; /* 텍스트 중앙 정렬 */
+            text-align: center;
         }
         .pass-input::placeholder { color: #333; font-family: var(--sys-font); letter-spacing: 1px; font-weight: normal; text-shadow: none; font-size: 1rem;}
         .input-group:focus-within { border-bottom-color: var(--gold); }
 
-        /* 지문 인식 스캐너 (개선됨) */
+        /* 지문 인식 스캐너 */
         .fingerprint-wrapper { 
             text-align: center; margin-top: 15px; width: 100%;
             display: flex; flex-direction: column; align-items: center; 
@@ -145,7 +144,6 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         
-        /* 회전하는 링 효과 */
         .fp-ring {
             position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
             border-radius: 50%; border: 1px dashed #333;
@@ -220,17 +218,17 @@
         .sanity-bar { width: 60px; height: 5px; background: #222; border: 1px solid #444; position: relative; }
         .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
 
-        /* 시스템 로그 (PC만) */
+        /* ★ 시스템 로그 (수정됨: 모바일에서도 보이게) ★ */
         #system-log {
-            display: none;
-            position: fixed; bottom: 20px; right: 20px; width: 300px; height: 150px;
-            background: rgba(0,0,0,0.8); border: 1px solid #333;
-            z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.7rem;
+            display: flex; /* 항상 flex로 표시 */
+            position: fixed; bottom: 10px; right: 10px; width: 280px; height: 120px;
+            background: rgba(0,0,0,0.6); border: 1px solid #333;
+            z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.65rem;
             color: #555; overflow: hidden; pointer-events: none;
             flex-direction: column; justify-content: flex-end;
+            backdrop-filter: blur(2px);
         }
-        @media (min-width: 900px) { #system-log { display: flex; } }
-        .log-line { margin-bottom: 4px; border-bottom: 1px solid #111; padding-bottom: 2px; }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(50,50,50,0.5); padding-bottom: 2px; }
         .log-line:last-child { color: var(--gold); animation: flash 0.5s; }
 
         /* HERO */
@@ -277,7 +275,6 @@
         .sec-title { font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); margin-bottom: 10px; }
         .sec-desc { color: #888; font-size: 0.9rem; line-height: 1.6; word-break: keep-all; }
 
-        /* 정보 그리드 */
         .info-grid { display: flex; flex-direction: column; gap: 30px; align-items: center; }
         .info-img { width: 100%; height: 250px; background: #111; border: 1px solid #333; object-fit: cover; filter: grayscale(50%); transition: 0.5s; cursor: pointer;}
         .info-text { width: 100%; }
@@ -298,7 +295,6 @@
         .room-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: linear-gradient(to top, #000, transparent); }
         .room-name { font-family: 'Cinzel'; font-size: 1.2rem; color: #fff; }
 
-        /* 캐릭터 카드 스타일 수정 */
         .char-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .char-card { background: #0a0a0a; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
         .char-card:hover { border-color: var(--gold); transform: translateY(-5px); }
@@ -306,20 +302,19 @@
         .char-img { width: 100%; height: 350px; background-size: cover; background-position: top center; filter: grayscale(100%); transition: 0.5s; }
         .char-card:hover .char-img { filter: grayscale(0%); }
 
-        /* ★ 텍스트 색상 분리 및 디자인 ★ */
         .char-info { padding: 15px 20px; border-top: 1px solid #111; }
         .c-alias { 
             font-family: 'Cinzel', serif; 
             font-size: 1.4rem; 
             font-weight: 700; 
-            color: var(--gold); /* 이름은 금색 */
+            color: var(--gold); 
             margin-bottom: 5px;
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
         .c-role { 
             font-family: var(--sys-font); 
             font-size: 0.85rem; 
-            color: #777; /* 역할은 차분한 회색 */
+            color: #777; 
             text-transform: uppercase; 
             letter-spacing: 2px;
         }
@@ -367,7 +362,6 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; }
         .gallery-thumb { height: 60px; background-size: cover; background-position: center; border: 1px solid #333; filter: grayscale(100%); }
 
-        /* ★ 모달 내부 타이포그래피 ★ */
         .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; display: inline-block; }
         .m-title { font-family: 'Cinzel'; font-size: 2rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
         .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 15px; font-size: 0.8rem; }
@@ -377,7 +371,6 @@
             font-size: 0.95rem; text-align: center;
         }
         
-        /* 프로필 상세 항목 (간결화) */
         .m-info-row { display: flex; margin-bottom: 8px; font-size: 0.9rem; align-items: flex-start; }
         .m-info-label { color: var(--gold); font-family: var(--sys-font); width: 80px; flex-shrink: 0; opacity: 0.8; }
         .m-info-value { color: #ccc; line-height: 1.4; }
@@ -388,7 +381,6 @@
             font-size: 0.75rem; color: #888; border-radius: 4px; font-family: var(--sys-font);
         }
 
-        /* ★ 모달 내부: 시설 스펙 그리드 ★ */
         .facility-specs {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
             margin: 20px 0; padding: 15px;
@@ -398,7 +390,6 @@
         .spec-label { font-family: var(--sys-font); font-size: 0.7rem; color: #666; }
         .spec-value { font-family: 'Share Tech Mono'; color: var(--gold-light); font-size: 1rem; letter-spacing: 1px; }
 
-        /* ★ 모달 내부: 액션 버튼들 ★ */
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .action-btn {
             flex: 1; padding: 12px; background: transparent;
@@ -407,8 +398,14 @@
             transition: 0.3s; text-align: center;
         }
         .action-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(179, 139, 72, 0.1); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #333; color: #444; }
 
-        /* ★ 텍스트 디코딩 효과용 클래스 ★ */
+        /* 상태 표시용 (새로 추가됨) */
+        #action-status-display {
+            margin-top: 10px; font-family: var(--sys-font); color: var(--gold); 
+            font-size: 0.8rem; text-align: center; height: 20px;
+        }
+
         .decode-text { display: inline-block; min-height: 1.2em; }
 
         .redacted { 
@@ -432,6 +429,58 @@
         #lightbox-img { max-width: 100%; max-height: 100%; object-fit: contain; }
 
         footer { text-align: center; padding: 50px 0; color: #444; font-family: var(--sys-font); font-size: 0.7rem; border-top: 1px solid #222; }
+
+        /* 알림창 스타일 */
+        #alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 20000;
+            display: none; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .alert-box {
+            width: 90%; max-width: 500px;
+            background: #0a0a0a; border: 1px solid var(--gold);
+            box-shadow: 0 0 50px rgba(179, 139, 72, 0.2);
+            display: flex; flex-direction: column;
+            animation: alertPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-box::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--gold);
+            animation: scanLine 2s linear infinite;
+        }
+
+        @keyframes alertPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .alert-header {
+            background: #111; padding: 10px 20px;
+            font-family: var(--sys-font); color: var(--red-alert);
+            font-weight: bold; letter-spacing: 2px; border-bottom: 1px solid #333;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .alert-content { padding: 20px; display: flex; gap: 20px; align-items: center; }
+        .alert-img { 
+            width: 80px; height: 80px; border-radius: 50%; 
+            background-size: cover; background-position: center; 
+            border: 2px solid var(--gold); flex-shrink: 0;
+        }
+
+        .alert-details { display: flex; flex-direction: column; gap: 5px; }
+        .alert-sender { font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; font-weight: bold; }
+        .alert-msg { font-family: 'Noto Serif KR'; color: #ccc; font-style: italic; font-size: 0.95rem; margin-bottom: 5px; }
+        .alert-system-text { font-family: var(--sys-font); font-size: 0.7rem; color: #555; }
+
+        .alert-btn {
+            width: 100%; padding: 15px; background: var(--gold); border: none;
+            color: #000; font-family: var(--sys-font); font-weight: bold; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; letter-spacing: 2px;
+        }
+        .alert-btn:hover { background: #fff; }
 
         @media (max-width: 768px) { .hud-right { display: none; } }
 
@@ -576,6 +625,24 @@
         <img id="lightbox-img" src="" alt="Full View">
     </div>
 
+    <!-- 알림창 -->
+    <div id="alert-overlay">
+        <div class="alert-box">
+            <div class="alert-header">
+                <span class="blink-cursor"></span> INCOMING TRANSMISSION
+            </div>
+            <div class="alert-content">
+                <div class="alert-img" id="alert-img"></div>
+                <div class="alert-details">
+                    <div class="alert-sender" id="alert-sender">UNKNOWN</div>
+                    <div class="alert-msg" id="alert-msg">"..."</div>
+                    <div class="alert-system-text">USER ID MATCHED. PRIVATE ROOM INVITE.</div>
+                </div>
+            </div>
+            <button class="alert-btn" onclick="closeAlert()">ACCEPT INVITATION</button>
+        </div>
+    </div>
+
     <script>
         const YOUTUBE_ID = "bG_UV0owkkE"; 
         let currentUser = "GUEST"; 
@@ -680,6 +747,20 @@
             osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now + 0.1);
         }
 
+        function playAlertSound() {
+            if (!audioCtx) initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, now); 
+            osc.frequency.setValueAtTime(1760, now + 0.1); 
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.6);
+        }
+
         // --- 데이터 ---
         const rooms = [
             { 
@@ -726,13 +807,13 @@
             }
         ];
 
-        // ★ 업데이트된 캐릭터 데이터 (역할 간소화 & GLASS 수정됨) ★
+        // ★ 캐릭터별 대사 추가 (personality) ★
         const characters = [
             { 
                 id: 1, 
                 alias: "OBSIDIAN", 
                 name: "차도윤 (Cha Doyun)", 
-                role: "Dominant",  // 간소화됨
+                role: "Dominant", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a1.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/a.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/11.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/1111.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/111.jpeg"],
                 meta: "38세 | CL그룹 후계자",
@@ -740,13 +821,18 @@
                 tags: ["#ENTJ", "#Tyrant", "#Perfectionist"],
                 appearance: "192cm / 근육질 / 올백머리 / 적안(Red Eyes)",
                 mask: "빛을 흡수하는 무광 검정 기하학 마스크",
-                play: "Tool Play, Breath Control, Verbal Domination"
+                play: "Tool Play, Breath Control, Verbal Domination",
+                private_msgs: [
+                    "\"내 방으로 와. 지금 당장.\"",
+                    "\"기다리는 건 질색이야. 서둘러.\"",
+                    "\"오늘 밤은 네가 필요해. 거절은 없어.\""
+                ]
             },
             { 
                 id: 2, 
                 alias: "AURUM", 
                 name: "서율 (Seo Yul)", 
-                role: "Dominant", // 간소화됨
+                role: "Dominant", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a2.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/b.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/22.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/2222.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/222.jpeg"],
                 meta: "32세 | VIP 웰니스 센터 대표",
@@ -754,13 +840,18 @@
                 tags: ["#ENFJ", "#Gaslighter", "#Possessive"],
                 appearance: "183cm / 부드러운 웨이브 / 웜톤 / 댄디룩",
                 mask: "금색 실로 장식된 섬세한 필리그리(Filigree)",
-                play: "Medical Play, Orgasm Control, Hypno"
+                play: "Medical Play, Orgasm Control, Hypno",
+                private_msgs: [
+                    "\"많이 긴장한 것 같네요. 제가 풀어드릴까요?\"",
+                    "\"당신을 위한 특별한 약을 준비했어요.\"",
+                    "\"쉬게 해줄게요. 제 품에서만.\""
+                ]
             },
             { 
                 id: 3, 
                 alias: "ECHO", 
                 name: "류이안 (Ryu Ian)", 
-                role: "Submissive", // 간소화됨
+                role: "Submissive", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a4.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/f.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/33.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/3333.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/333.jpeg"],
                 meta: "28세 | 천만 배우 & 톱 아이돌",
@@ -768,13 +859,18 @@
                 tags: ["#ISFP", "#AttentionSeeker", "#Masochist"],
                 appearance: "178cm / 퇴폐미 / 헝클어진 흑발 / 눈물점",
                 mask: "깨지기 쉬운 하얀 도자기 재질",
-                play: "Pet Play, Spanking, Voyeurism"
+                play: "Pet Play, Spanking, Voyeurism",
+                private_msgs: [
+                    "\"저 심심해요... 놀아주시면 안 돼요?\"",
+                    "\"주인님, 저 여기 있어요. 봐주세요...\"",
+                    "\"혼나고 싶어요. 아주 세게.\""
+                ]
             },
             {
                 id: 4, 
                 alias: "GLASS", 
                 name: "노엘 (Noel)", 
-                role: "Switch", // ★ 수정됨: Mad Scientist 제거 ★
+                role: "Switch", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/d.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/1127.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/44.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/4444.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/444.jpeg"],
                 meta: "33세 | 행동 심리학 교수",
@@ -782,13 +878,18 @@
                 tags: ["#ENTP", "#Hedonist", "#Fox"],
                 appearance: "181cm / 은발 쉼표 머리 / 보라색 눈 / 하네스",
                 mask: "투명한 크리스탈 장식 가면",
-                play: "Temperature, Electro Play, Teasing"
+                play: "Temperature, Electro Play, Teasing",
+                private_msgs: [
+                    "\"재밌는 실험을 하나 할까 하는데, 파트너가 필요해.\"",
+                    "\"네 반응, 꽤 흥미로운걸? 더 가까이서 보고 싶어.\"",
+                    "\"Darling, 길 잃었어? 내가 안내해줄까?\""
+                ]
             },
             {
                 id: 5, 
                 alias: "RENAULT", 
                 name: "르노 (Renault)", 
-                role: "Owner", // 간소화됨
+                role: "Owner", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/c.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/1768721903528_01.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/55.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/5555.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/555.jpeg"],
                 meta: "40대 초반 | 클럽 오너 & 자산가",
@@ -796,13 +897,18 @@
                 tags: ["#INTJ", "#Phantom", "#Noir"],
                 appearance: "185cm / 거대한 체구 / 올백 흑발 / 턱시도",
                 mask: "얼굴 반쪽을 가리는 검은색 하프 마스크",
-                play: "Voyeurism, Noir Roleplay, Fear Play"
+                play: "Voyeurism, Noir Roleplay, Fear Play",
+                private_msgs: [
+                    "\"자네를 주시하고 있었네. 잠깐 이야기를 하지.\"",
+                    "\"이곳이 마음에 드나? 더 깊은 곳을 보여주지.\"",
+                    "\"규칙을 어기지 않는 선에서, 자네를 원하네.\""
+                ]
             },
             {
                 id: 6, 
                 alias: "WHITE MISTRESS", 
                 name: "진보라 (Jin Bora)", 
-                role: "Dominant", // 간소화됨
+                role: "Dominant", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/a3.jpeg", 
                 gallery: ["https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/e.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/66.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/6666.jpeg", "https://pub-966fe0337afe4cf2b510d54dc3318e26.r2.dev/666.jpeg"],
                 meta: "36세 | 아트 센터 관장",
@@ -810,7 +916,12 @@
                 tags: ["#ESTJ", "#Queen", "#Aesthetic"],
                 appearance: "172cm / 백금발 / 벽안 / 킬힐 & 가죽 드레스",
                 mask: "우아한 흰색 레이스와 깃털 장식",
-                play: "Human Furniture, Trampling, Aesthetic"
+                play: "Human Furniture, Trampling, Aesthetic",
+                private_msgs: [
+                    "\"내 발 밑이 비었어. 와서 채워.\"",
+                    "\"고개 숙이고 들어와. 감히 눈 마주치지 말고.\"",
+                    "\"아름답게 굴복할 준비는 되었니?\""
+                ]
             }
         ];
 
@@ -857,7 +968,6 @@
             mImg.style.backgroundImage = `url('${src}')`;
         }
 
-        // ★ 텍스트 디코딩 애니메이션 함수 (새로 추가됨) ★
         function runTextDecode(element, finalText, speed = 30) {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*";
             let iterations = 0;
@@ -871,62 +981,80 @@
                     .join("");
                 
                 if (iterations >= finalText.length) clearInterval(interval);
-                iterations += 1 / 3; // 속도 조절
+                iterations += 1 / 3;
             }, speed);
         }
 
-        // ★ 시설 모달 열기 함수 (업데이트됨) ★
+        // ★ 시설 모달 상호작용 기능 추가 ★
+        function performRoomAction(type, roomName) {
+            const statusDisplay = document.getElementById('action-status-display');
+            const btn = event.target;
+            
+            playKeySound();
+
+            if(type === 'check') {
+                btn.disabled = true;
+                btn.innerText = "SCANNING...";
+                statusDisplay.innerText = "[ SYSTEM DIAGNOSTIC INITIATED ]";
+                
+                let progress = 0;
+                const timer = setInterval(() => {
+                    progress += 20;
+                    statusDisplay.innerText = `[ SCANNING... ${progress}% ]`;
+                    if(progress >= 100) {
+                        clearInterval(timer);
+                        const result = Math.random() > 0.8 ? "ANOMALY DETECTED" : "SYSTEM NORMAL";
+                        const color = result === "ANOMALY DETECTED" ? "#8b0000" : "#b38b48";
+                        statusDisplay.innerHTML = `<span style="color:${color}; font-weight:bold;">RESULT: ${result}</span>`;
+                        btn.innerText = "CHECK COMPLETE";
+                        addLog(`Diagnostic result for ${roomName}: ${result}`);
+                        setTimeout(() => { btn.disabled = false; btn.innerText = "SYSTEM CHECK"; }, 3000);
+                    }
+                }, 400);
+            } else if (type === 'clean') {
+                btn.disabled = true;
+                btn.innerText = "DISPATCHED";
+                statusDisplay.innerText = "[ CLEANING BOT DISPATCHED ]";
+                addLog(`Cleaning bot en route to ${roomName}.`);
+                setTimeout(() => {
+                    statusDisplay.innerText = "[ CLEANING IN PROGRESS ]";
+                }, 1500);
+                setTimeout(() => {
+                    statusDisplay.innerText = "[ CLEANING COMPLETE ]";
+                    btn.disabled = false;
+                    btn.innerText = "REQ. CLEANING";
+                    addLog(`${roomName} is now clean.`);
+                }, 4000);
+            }
+        }
+
         function openRoomModal(room) {
             setModalImage(room.img);
             mStamp.innerText = "FACILITY STATUS";
             mStamp.style.color = "#ccc"; mStamp.style.borderColor = "#ccc";
-            
-            // 제목 디코딩 효과 적용
-            mTitle.innerText = ""; // 초기화
+            mTitle.innerText = ""; 
             mTitle.classList.add('decode-text');
-            
             mSub.innerText = `CURRENT STATUS: ${room.status}`;
             
-            // 스펙 그리드 및 액션 버튼 추가 (휑한 느낌 제거)
             mContent.innerHTML = `
                 <div class="m-section">
                     <p class="m-text" style="min-height: 60px;">${room.desc}</p>
                 </div>
-
                 <div class="facility-specs">
-                    <div class="spec-item">
-                        <span class="spec-label">TEMP / HUMIDITY</span>
-                        <span class="spec-value">${room.specs.temp} / 45%</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">SECURITY LEVEL</span>
-                        <span class="spec-value">${room.specs.security}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">SOUNDPROOF</span>
-                        <span class="spec-value">${room.specs.sound}</span>
-                    </div>
-                    <div class="spec-item">
-                        <span class="spec-label">CAPACITY</span>
-                        <span class="spec-value">${room.specs.capacity}</span>
-                    </div>
+                    <div class="spec-item"><span class="spec-label">TEMP / HUMIDITY</span><span class="spec-value">${room.specs.temp} / 45%</span></div>
+                    <div class="spec-item"><span class="spec-label">SECURITY LEVEL</span><span class="spec-value">${room.specs.security}</span></div>
+                    <div class="spec-item"><span class="spec-label">SOUNDPROOF</span><span class="spec-value">${room.specs.sound}</span></div>
+                    <div class="spec-item"><span class="spec-label">CAPACITY</span><span class="spec-value">${room.specs.capacity}</span></div>
                 </div>
-
                 <div class="modal-actions">
-                    <button class="action-btn" onclick="addLog('System Check requested for ${room.name}'); playKeySound();">SYSTEM CHECK</button>
-                    <button class="action-btn" onclick="addLog('Cleaning bot dispatched to ${room.name}'); playKeySound();">REQ. CLEANING</button>
+                    <button class="action-btn" onclick="performRoomAction('check', '${room.name}')">SYSTEM CHECK</button>
+                    <button class="action-btn" onclick="performRoomAction('clean', '${room.name}')">REQ. CLEANING</button>
                 </div>
+                <div id="action-status-display"></div>
             `;
-            
             mGallery.style.display = 'none';
             modal.style.display = 'flex';
-            
-            // 모달이 뜬 후 텍스트 디코딩 실행 (소리 효과 제거됨)
-            setTimeout(() => {
-                runTextDecode(mTitle, room.name.split(' (')[0]);
-                // playScanSound(); // <--- 소리 제거 완료!
-            }, 100);
-
+            setTimeout(() => { runTextDecode(mTitle, room.name.split(' (')[0]); }, 100);
             attachRedactedEvent();
         }
 
@@ -934,41 +1062,19 @@
             setModalImage(c.img);
             mStamp.innerText = "TOP SECRET";
             mStamp.style.color = "#8b0000"; mStamp.style.borderColor = "#8b0000";
-            
-            // 이름 뒤에 실명은 작게 표시하거나, 역할 강조
             mTitle.innerHTML = `${c.alias} <span style="font-size:0.5em; color:#555; vertical-align:middle;">${c.name.split('(')[0]}</span>`;
             mSub.innerText = c.role; 
             
-            // 태그 생성
             let tagsHtml = '<div class="m-tags">';
             c.tags.forEach(t => { tagsHtml += `<span class="m-tag">${t}</span>`; });
             tagsHtml += '</div>';
 
             mContent.innerHTML = `
                 <div class="m-quote">${c.quote}</div>
-                
-                <div class="m-info-row">
-                    <div class="m-info-label">IDENTITY</div>
-                    <div class="m-info-value">${c.meta}</div>
-                </div>
-
-                <div class="m-info-row">
-                    <div class="m-info-label">VISUAL</div>
-                    <div class="m-info-value">
-                        ${c.appearance}<br>
-                        <span style="color:#666; font-size:0.8em;">[MASK] ${c.mask}</span>
-                    </div>
-                </div>
-                
-                <div class="m-info-row">
-                    <div class="m-info-label">STYLE</div>
-                    <div class="m-info-value">${tagsHtml}</div>
-                </div>
-
-                <div class="m-info-row">
-                    <div class="m-info-label">PLAY</div>
-                    <div class="m-info-value" style="color:#e6c88b;">${c.play}</div>
-                </div>
+                <div class="m-info-row"><div class="m-info-label">IDENTITY</div><div class="m-info-value">${c.meta}</div></div>
+                <div class="m-info-row"><div class="m-info-label">VISUAL</div><div class="m-info-value">${c.appearance}<br><span style="color:#666; font-size:0.8em;">[MASK] ${c.mask}</span></div></div>
+                <div class="m-info-row"><div class="m-info-label">STYLE</div><div class="m-info-value">${tagsHtml}</div></div>
+                <div class="m-info-row"><div class="m-info-label">PLAY</div><div class="m-info-value" style="color:#e6c88b;">${c.play}</div></div>
             `;
             mGallery.innerHTML = '';
             mGallery.style.display = 'grid';
@@ -1004,10 +1110,8 @@
             lightbox.style.display = 'none';
         }
 
-        // ★ 검열된 텍스트 클릭 이벤트 (모바일 대응) ★
         function attachRedactedEvent() {
             document.querySelectorAll('.redacted').forEach(el => {
-                // 클릭하면 'revealed' 클래스 토글 (보였다 안보였다)
                 el.addEventListener('click', () => {
                     el.classList.toggle('revealed');
                     playHoverSound();
@@ -1043,17 +1147,14 @@
         function startHold(e) {
             if (e.button && e.button !== 0) return;
             const inputVal = document.getElementById('pass-input').value.trim();
-            
             if(inputVal.length < 1) {
                 document.getElementById('pass-input').style.borderBottomColor = '#8b0000';
                 return;
             }
             currentUser = inputVal; 
-
             isHolding = true;
             fpScanner.classList.add('scanning'); 
             startChargeSound();
-            
             holdTimer = setTimeout(() => {
                 if (isHolding) {
                     stopChargeSound();
@@ -1103,11 +1204,49 @@
                         main.style.opacity = 1;
                         addLog(`User [${currentUser}] connected.`);
                         addLog("Biometric data synced.");
-                        // 초기 로딩된 요소에도 이벤트 연결
                         attachRedactedEvent();
+                        startEventLoop(); // 랜덤 이벤트 시작
                     }, 100);
                 }, 1500);
             }, 3000);
+        }
+
+        // --- 랜덤 이벤트 로직 (업데이트: 빈도 조절 & 캐릭터별 대사) ---
+        function triggerRandomEvent() {
+            if(document.getElementById('stage-intro').style.display !== 'none') return;
+            if(document.getElementById('modal-overlay').style.display === 'flex') return;
+            if(document.getElementById('alert-overlay').style.display === 'flex') return;
+
+            // 랜덤 캐릭터 선택
+            const randomChar = characters[Math.floor(Math.random() * characters.length)];
+            
+            // 해당 캐릭터의 전용 대사 중 랜덤 선택
+            const msgList = randomChar.private_msgs;
+            const randomMsg = msgList[Math.floor(Math.random() * msgList.length)];
+
+            document.getElementById('alert-img').style.backgroundImage = `url('${randomChar.img}')`;
+            document.getElementById('alert-sender').innerText = randomChar.alias;
+            document.getElementById('alert-msg').innerText = randomMsg;
+
+            playAlertSound();
+            document.getElementById('alert-overlay').style.display = 'flex';
+            addLog(`[ALERT] Private Signal from ${randomChar.alias}`);
+        }
+
+        function closeAlert() {
+            document.getElementById('alert-overlay').style.display = 'none';
+            playKeySound();
+            addLog("User accepted the invitation.");
+        }
+
+        let eventTimer;
+        function startEventLoop() {
+            // 60초 ~ 120초 (1분~2분) 사이 랜덤
+            const randomTime = (Math.random() * 60000) + 60000; 
+            eventTimer = setTimeout(() => {
+                triggerRandomEvent();
+                startEventLoop();
+            }, randomTime);
         }
 
         setInterval(() => {
@@ -1124,6 +1263,7 @@
             const time = new Date().toTimeString().split(' ')[0];
             line.innerText = `[${time}] ${msg}`;
             logBox.appendChild(line);
+            // 로그가 너무 쌓이면 삭제
             if(logBox.children.length > 6) {
                 logBox.removeChild(logBox.firstChild);
             }
@@ -1143,5 +1283,3 @@
     </script>
 </body>
 </html>
-
-
