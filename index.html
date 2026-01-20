@@ -218,9 +218,9 @@
         .sanity-bar { width: 60px; height: 5px; background: #222; border: 1px solid #444; position: relative; }
         .sanity-fill { width: 92%; height: 100%; background: var(--gold); opacity: 0.7; }
 
-        /* ★ 시스템 로그 (수정됨: 모바일에서도 보이게) ★ */
+        /* 시스템 로그 */
         #system-log {
-            display: flex; /* 항상 flex로 표시 */
+            display: flex;
             position: fixed; bottom: 10px; right: 10px; width: 280px; height: 120px;
             background: rgba(0,0,0,0.6); border: 1px solid #333;
             z-index: 2900; padding: 10px; font-family: var(--sys-font); font-size: 0.65rem;
@@ -400,7 +400,7 @@
         .action-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(179, 139, 72, 0.1); }
         .action-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #333; color: #444; }
 
-        /* 상태 표시용 (새로 추가됨) */
+        /* 상태 표시용 */
         #action-status-display {
             margin-top: 10px; font-family: var(--sys-font); color: var(--gold); 
             font-size: 0.8rem; text-align: center; height: 20px;
@@ -483,6 +483,100 @@
         .alert-btn:hover { background: #fff; }
 
         @media (max-width: 768px) { .hud-right { display: none; } }
+
+        /* ================= NEW: CONTRACT SECTION STYLE ================= */
+        #contract-section { margin-bottom: 50px; }
+
+        .contract-container {
+            display: flex; flex-direction: column; align-items: center; gap: 30px;
+            width: 100%; max-width: 800px; margin: 0 auto;
+        }
+
+        .contract-box {
+            width: 100%; background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #333; border-top: 3px solid var(--gold);
+            padding: 2px; /* 이중 테두리 느낌 */
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .contract-header {
+            background: #151515; padding: 10px 15px;
+            font-family: var(--sys-font); color: #666; font-size: 0.75rem;
+            border-bottom: 1px solid #333; letter-spacing: 1px;
+            display: flex; justify-content: space-between;
+        }
+
+        .contract-body {
+            padding: 30px; font-family: 'Noto Serif KR', serif; color: #ccc;
+            font-size: 0.95rem; line-height: 1.8;
+            background: radial-gradient(circle at center, #0e0e0e 0%, #050505 100%);
+        }
+        .contract-body ol { margin-left: 20px; color: #aaa; }
+        .contract-body li { margin-bottom: 8px; }
+        .contract-warning { 
+            color: var(--red-alert); font-family: var(--sys-font); font-size: 0.8rem; 
+            margin-top: 20px; text-align: center; letter-spacing: 1px;
+        }
+
+        .contract-footer {
+            padding: 15px 30px; border-top: 1px solid #333; background: #080808;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 커스텀 체크박스 */
+        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+        .checkbox-wrapper input { display: none; }
+        
+        .custom-checkbox {
+            width: 18px; height: 18px; border: 1px solid #555;
+            display: inline-block; position: relative; transition: 0.3s;
+            background: #000;
+        }
+        
+        .checkbox-wrapper input:checked + .custom-checkbox {
+            border-color: var(--gold);
+            background: var(--gold);
+            box-shadow: 0 0 10px var(--gold);
+        }
+        
+        .checkbox-wrapper input:checked + .custom-checkbox::after {
+            content: '✔'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: #000; font-size: 12px; font-weight: bold;
+        }
+
+        .agree-text { font-family: var(--sys-font); color: #888; font-size: 0.9rem; transition: 0.3s; }
+        .checkbox-wrapper:hover .agree-text { color: #ccc; }
+        .checkbox-wrapper input:checked ~ .agree-text { color: var(--gold); text-shadow: 0 0 5px rgba(179, 139, 72, 0.3); }
+
+        /* 입장 버튼 */
+        .enter-btn {
+            position: relative; width: 100%; max-width: 300px; height: 60px;
+            background: #000; border: 1px solid #333; color: #444;
+            font-family: 'Cinzel', serif; font-size: 1.2rem; letter-spacing: 3px;
+            cursor: not-allowed; transition: 0.5s; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .enter-btn:not(:disabled) {
+            border-color: var(--gold); color: var(--gold); cursor: pointer;
+            box-shadow: 0 0 20px rgba(179, 139, 72, 0.1);
+        }
+        .enter-btn:not(:disabled):hover {
+            background: rgba(179, 139, 72, 0.1);
+            box-shadow: 0 0 40px rgba(179, 139, 72, 0.3);
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        .btn-scan-line {
+            position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(179, 139, 72, 0.4), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .enter-btn:not(:disabled):hover .btn-scan-line {
+            animation: btnScan 1s infinite linear;
+        }
+        
+        @keyframes btnScan { 0% { left: -100%; } 100% { left: 200%; } }
 
     </style>
 </head>
@@ -598,6 +692,49 @@
             </div>
             <div class="char-grid" id="char-grid"></div>
         </section>
+
+        <!-- ================= NEW: CONTRACT SECTION ================= -->
+        <section id="contract-section">
+            <div class="sec-header">
+                <h2 class="sec-title">The Pledge</h2>
+                <div class="sec-desc">입장을 위한 마지막 절차</div>
+            </div>
+
+            <div class="contract-container">
+                <div class="contract-box">
+                    <div class="contract-header">
+                        <span>SECURITY PROTOCOL: FINAL_AGREEMENT</span>
+                        <span class="blink-cursor">_</span>
+                    </div>
+                    <div class="contract-body">
+                        <p>본인은 <strong>La Cage Dorée</strong>의 모든 규칙을 숙지하였으며, 이곳에서 발생하는 모든 행위에 대한 책임을 질 것을 엄숙히 서약합니다.</p>
+                        <br>
+                        <ol>
+                            <li>본 시설 내의 모든 정보는 <span class="redacted">외부 유출이 금지</span>되며, 위반 시 법적/신체적 책임을 감수합니다.</li>
+                            <li>타인의 익명성을 절대적으로 보장하며, 현실에서의 추적을 시도하지 않습니다.</li>
+                            <li>본인의 심신미약으로 인한 사고에 대해 시설 측에 책임을 묻지 않습니다.</li>
+                            <li><strong>"욕망은 허락된 자만이 누릴 수 있다."</strong></li>
+                        </ol>
+                        <br>
+                        <p class="contract-warning">※ 동의 버튼을 누르는 즉시 귀하의 생체 데이터가 영구 기록됩니다.</p>
+                    </div>
+                    
+                    <div class="contract-footer">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="contract-check" onchange="toggleSubmitBtn()">
+                            <span class="custom-checkbox"></span>
+                            <span class="agree-text">위 서약 내용을 모두 확인하였으며, 이에 동의합니다.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="btn-enter-story" class="enter-btn" disabled onclick="submitContract()">
+                    <span class="btn-text">ACCEPT & ENTER</span>
+                    <div class="btn-scan-line"></div>
+                </button>
+            </div>
+        </section>
+        <!-- ================= END CONTRACT SECTION ================= -->
 
         <footer>
             © 2026 La Cage Dorée. All rights reserved.<br>
@@ -1279,6 +1416,48 @@
                 height: '0', width: '0', videoId: YOUTUBE_ID,
                 playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': YOUTUBE_ID }
             });
+        }
+
+        // ================= CONTRACT LOGIC (NEW) ================= //
+        
+        // ★★★ 여기에 이동할 스토리 페이지 주소를 적으세요 ★★★
+        const TARGET_STORY_URL = "https://share.crack.wrtn.ai/dyj4k5"; 
+
+        function toggleSubmitBtn() {
+            const checkbox = document.getElementById('contract-check');
+            const btn = document.getElementById('btn-enter-story');
+            
+            if (checkbox.checked) {
+                btn.disabled = false;
+                playHoverSound();
+                addLog("User agreed to terms.");
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        function submitContract() {
+            const btn = document.getElementById('btn-enter-story');
+            const btnText = btn.querySelector('.btn-text');
+            
+            playUnlockSound();
+            
+            btn.disabled = true;
+            btn.style.borderColor = "#fff";
+            btn.style.backgroundColor = "#b38b48"; // var(--gold)
+            btn.style.color = "#000";
+            btnText.innerText = "ACCESS GRANTED";
+            
+            addLog("PLEDGE ACCEPTED. REDIRECTING...");
+
+            const main = document.getElementById('main-content');
+            main.style.transition = "opacity 2s, filter 2s";
+            main.style.opacity = 0;
+            main.style.filter = "blur(10px)";
+
+            setTimeout(() => {
+                window.location.href = TARGET_STORY_URL;
+            }, 2000);
         }
     </script>
 </body>
