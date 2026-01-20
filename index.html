@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Cage Dorée - SYSTEM V2.5</title>
+    <title>La Cage Dorée - SYSTEM V2.6</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
         :root {
             --gold: #b38b48;
             --gold-light: #e6c88b;
-            --red-alert: #8b0000;
+            --red-alert: #ff1a1a; /* 더 밝은 경고색 */
             --black: #050505;
             --panel-bg: rgba(10, 10, 10, 0.95);
             --sys-font: 'Share Tech Mono', monospace;
@@ -31,7 +31,7 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; }
 
-        /* ★ 배경 금가루 파티클 캔버스 ★ */
+        /* 배경 금가루 파티클 */
         #gold-dust {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 1; opacity: 0.6;
@@ -203,7 +203,7 @@
         #main-content {
             display: none; opacity: 0; transition: opacity 2s;
             height: 100vh; overflow-y: auto; padding-bottom: 80px;
-            position: relative; z-index: 10; /* 캔버스 위에 표시 */
+            position: relative; z-index: 10;
         }
 
         /* HUD */
@@ -236,6 +236,7 @@
         }
         .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(50,50,50,0.5); padding-bottom: 2px; }
         .log-line:last-child { color: var(--gold); animation: flash 0.5s; }
+        .log-danger { color: var(--red-alert) !important; font-weight: bold; text-shadow: 0 0 5px var(--red-alert); }
 
         /* HERO */
         .hero {
@@ -337,6 +338,7 @@
             flex-direction: column;
             box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative;
             animation: modalOpen 0.3s ease-out;
+            transition: border-color 0.3s, box-shadow 0.3s; /* 경고 효과 트랜지션 */
         }
         
         @media (min-width: 900px) {
@@ -368,7 +370,17 @@
         .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; }
         .gallery-thumb { height: 60px; background-size: cover; background-position: center; border: 1px solid #333; filter: grayscale(100%); }
 
-        .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; display: inline-block; }
+        .m-stamp { border: 2px solid #8b0000; color: #8b0000; font-family: 'Cinzel'; font-weight: 900; padding: 3px 10px; transform: rotate(-2deg); margin-bottom: 15px; font-size: 0.8rem; display: inline-block; transition: 0.3s; }
+        
+        /* 위험 인물용 깜빡이는 스탬프 효과 */
+        .danger-stamp {
+            color: var(--red-alert) !important;
+            border-color: var(--red-alert) !important;
+            animation: dangerPulse 0.8s infinite alternate;
+            text-shadow: 0 0 10px var(--red-alert);
+        }
+        @keyframes dangerPulse { from { opacity: 0.6; } to { opacity: 1; transform: rotate(-2deg) scale(1.05); } }
+
         .m-title { font-family: 'Cinzel'; font-size: 2rem; color: var(--gold); margin-bottom: 5px; line-height: 1; }
         .m-sub { font-family: var(--sys-font); color: #666; margin-bottom: 15px; font-size: 0.8rem; }
         .m-quote { 
@@ -1046,9 +1058,9 @@
                 mask: "얼굴 반쪽을 가리는 검은색 하프 마스크",
                 play: "Voyeurism, Noir Roleplay, Fear Play",
                 private_msgs: [
-                    "\"자네를 주시하고 있었네. 잠깐 이야기를 하지.\"",
-                    "\"이곳이 마음에 드나? 더 깊은 곳을 보여주지.\"",
-                    "\"규칙을 어기지 않는 선에서, 자네를 원하네.\""
+                    "\"제 시야에 들어오셨더군요. 잠깐, 이야기를 나눌까요.\"",
+                    "\"감당할 수 있겠습니까? 저 깊은 심연을.\"",
+                    "\"제 울타리 안으로 들어오시죠. 완벽하게.\""
                 ]
             },
             {
@@ -1103,6 +1115,7 @@
         });
 
         const modal = document.getElementById('modal-overlay');
+        const modalBox = document.querySelector('.modal-box'); // 모달 박스 선택
         const mImg = document.getElementById('m-img');
         const mTitle = document.getElementById('m-title');
         const mSub = document.getElementById('m-sub');
@@ -1177,8 +1190,14 @@
 
         function openRoomModal(room) {
             setModalImage(room.img);
+            
+            // 시설 모달은 기본 스타일 유지
             mStamp.innerText = "FACILITY STATUS";
             mStamp.style.color = "#ccc"; mStamp.style.borderColor = "#ccc";
+            mStamp.classList.remove('danger-stamp');
+            modalBox.style.borderColor = "#b38b48"; // 원래 금색
+            modalBox.style.boxShadow = "0 0 50px rgba(0,0,0,0.8)";
+            
             mTitle.innerText = ""; 
             mTitle.classList.add('decode-text');
             mSub.innerText = `CURRENT STATUS: ${room.status}`;
@@ -1207,8 +1226,38 @@
 
         function openCharModal(c) {
             setModalImage(c.img);
-            mStamp.innerText = "TOP SECRET";
-            mStamp.style.color = "#8b0000"; mStamp.style.borderColor = "#8b0000";
+            
+            // 위험 인물 감지 로직 (ID 1: Obsidian, ID 5: Renault)
+            if (c.id === 1 || c.id === 5) {
+                // 위험 인물 스타일 적용
+                mStamp.innerText = c.id === 5 ? "NO APPROACH" : "EXTREME RISK"; // 르노는 접근금지, 도윤은 극도의 위험
+                mStamp.style.color = ""; // 클래스 스타일 사용을 위해 인라인 스타일 제거
+                mStamp.style.borderColor = ""; 
+                mStamp.classList.add('danger-stamp');
+                
+                // 모달 박스 테두리 붉게 변경
+                modalBox.style.borderColor = "#ff1a1a";
+                modalBox.style.boxShadow = "0 0 50px rgba(255, 26, 26, 0.3)";
+                
+                // 경고음 및 로그
+                playAlertSound();
+                const logMsg = document.createElement('div');
+                logMsg.className = 'log-line log-danger';
+                logMsg.innerText = `[WARNING] HIGH THREAT LEVEL ENTITY: ${c.alias}`;
+                document.getElementById('system-log').appendChild(logMsg);
+
+            } else {
+                // 일반 인물 스타일
+                mStamp.innerText = "TOP SECRET";
+                mStamp.style.color = "#8b0000"; 
+                mStamp.style.borderColor = "#8b0000";
+                mStamp.classList.remove('danger-stamp');
+                
+                // 모달 박스 테두리 금색 복구
+                modalBox.style.borderColor = "#b38b48";
+                modalBox.style.boxShadow = "0 0 50px rgba(0,0,0,0.8)";
+            }
+
             mTitle.innerHTML = `${c.alias} <span style="font-size:0.5em; color:#555; vertical-align:middle;">${c.name.split('(')[0]}</span>`;
             mSub.innerText = c.role; 
             
