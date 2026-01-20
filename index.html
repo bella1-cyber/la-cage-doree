@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>La Cage Dorée - SYSTEM V2.0</title>
+    <title>La Cage Dorée - SYSTEM V2.5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+KR:wght@300;400;700&family=Share+Tech+Mono&display=swap');
 
@@ -30,6 +30,12 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: #333; }
+
+        /* ★ 배경 금가루 파티클 캔버스 ★ */
+        #gold-dust {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; opacity: 0.6;
+        }
 
         /* ================= STAGE 1: INTRO ================= */
         #stage-intro {
@@ -197,7 +203,7 @@
         #main-content {
             display: none; opacity: 0; transition: opacity 2s;
             height: 100vh; overflow-y: auto; padding-bottom: 80px;
-            position: relative;
+            position: relative; z-index: 10; /* 캔버스 위에 표시 */
         }
 
         /* HUD */
@@ -484,7 +490,7 @@
 
         @media (max-width: 768px) { .hud-right { display: none; } }
 
-        /* ================= NEW: CONTRACT SECTION STYLE ================= */
+        /* ================= CONTRACT SECTION STYLE ================= */
         #contract-section { margin-bottom: 50px; }
 
         .contract-container {
@@ -581,6 +587,8 @@
     </style>
 </head>
 <body>
+    <!-- 배경 파티클용 캔버스 -->
+    <canvas id="gold-dust"></canvas>
 
     <div id="youtube-player" style="display:none;"></div>
 
@@ -629,7 +637,7 @@
         <div id="system-hud">
             <div class="hud-left">
                 <div class="hud-item"><span class="live-dot"></span> <span style="color:#8b0000; font-weight:bold;">LIVE</span></div>
-                <div class="hud-item"><span class="hud-label">USER:</span> <span class="hud-value" id="hud-user">UNKNOWN</span></div>
+                <div class="hud-item"><span class="hud-label">USER:</span> <span class="hud-value" id="hud-user">UNVERIFIED</span></div>
             </div>
             <div class="hud-right">
                 <div class="hud-item"><span class="hud-label">SANITY:</span> <div class="sanity-bar"><div class="sanity-fill"></div></div></div>
@@ -644,7 +652,7 @@
         <div class="hero">
             <div class="hero-slogan">"욕망은 허락된 자만이 누릴 수 있다"</div>
             <h1>La Cage Dorée</h1>
-            <p class="hero-sub">THE GOLDEN BIRDCAGE // PRIVATE SECTOR</p>
+            <p class="hero-sub">SECRET BOUTIQUE GALLERY // GANGNAM</p>
             <div class="scroll-down">
                 <span style="font-family: var(--sys-font); font-size: 0.8rem;">SCROLL</span>
                 <span style="font-size: 1.5rem;">↓</span>
@@ -662,16 +670,16 @@
                     <h3>Membership Criteria</h3>
                     <ul>
                         <li>기존 회원의 추천 및 초대장 소지자</li>
-                        <li>48시간 이내 발급된 <span class="redacted">유효한 의료 검진</span> 결과</li>
-                        <li>사회적 지위 및 비밀 유지 서약 확인</li>
+                        <li>48시간 이내 발급된 <span class="redacted">성병/약물 검진</span> 결과</li>
+                        <li>심리 테스트 및 성향 심층 면담 통과</li>
                     </ul>
                     <br>
                     <h3>Club Rules</h3>
                     <ul>
-                        <li><strong>Mask:</strong> 입장 순간부터 퇴장 시까지 RFID 가면 착용 필수.</li>
-                        <li><strong>Privacy:</strong> 실명 사용 금지. 오직 코드네임으로만 호칭.</li>
-                        <li><strong>Consent:</strong> "No means no." 거부는 존중하되, <span class="redacted">침묵은 동의가 아님.</span></li>
-                        <li><strong>Security:</strong> 모든 전자기기 반입 금지. 적발 시 영구 제명.</li>
+                        <li><strong>Mask & RFID:</strong> 입장 시 RFID 칩이 내장된 가면 착용. 익명 보장 및 성향 식별.</li>
+                        <li><strong>Security:</strong> 녹화기기 반입 금지. CCTV 대신 전문 보안요원이 감시(Human Monitoring).</li>
+                        <li><strong>Consent:</strong> "No means no." 침묵은 동의가 아님.</li>
+                        <li><strong>Blacklist:</strong> 규칙 위반 시 영구 제명 및 블랙리스트 공유.</li>
                     </ul>
                 </div>
             </div>
@@ -693,7 +701,7 @@
             <div class="char-grid" id="char-grid"></div>
         </section>
 
-        <!-- ================= NEW: CONTRACT SECTION ================= -->
+        <!-- ================= CONTRACT SECTION ================= -->
         <section id="contract-section">
             <div class="sec-header">
                 <h2 class="sec-title">The Pledge</h2>
@@ -784,6 +792,9 @@
         const YOUTUBE_ID = "bG_UV0owkkE"; 
         let currentUser = "GUEST"; 
         let currentModalImage = "";
+
+        // ★★★ 여기에 이동할 스토리 페이지 주소를 적으세요 ★★★
+        const TARGET_STORY_URL = "story.html"; 
 
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
@@ -898,10 +909,10 @@
             osc.start(now); osc.stop(now + 0.6);
         }
 
-        // --- 데이터 ---
+        // --- 데이터 (세계관 반영) ---
         const rooms = [
             { 
-                name: "흑단실 (Black Room)", 
+                name: "흑단실 (Ebony Room)", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc4.jpeg", 
                 status: "OCCUPIED", 
                 desc: "완벽한 어둠과 고립. 시각이 차단된 상태에서 극대화되는 감각을 즐기는 공간입니다. <span class='redacted'>구속구와 감각 박탈 장비</span>가 구비되어 있습니다.",
@@ -929,22 +940,21 @@
                 specs: { temp: "24.0°C", sound: "N/A", security: "Lv.1", capacity: "Public" }
             },
             { 
+                name: "라운지 (The Lounge)", 
+                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", 
+                status: "OPEN", 
+                desc: "편광 유리벽을 통해 각 룸을 은밀히 관찰할 수 있는 중앙 홀. 가면 무도회와 같은 사교가 이루어집니다.",
+                specs: { temp: "24.0°C", sound: "Background", security: "Lv.2", capacity: "50 Max" }
+            },
+            { 
                 name: "상담실 (The Clinic)", 
                 img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc7.jpeg", 
                 status: "DR.WHITE", 
                 desc: "메디컬 플레이 및 심리 상담이 이루어지는 곳. 차가운 금속성과 소독약 냄새가 특징입니다.",
                 specs: { temp: "18.0°C", sound: "95% (High)", security: "Lv.4", capacity: "3 Max" }
-            },
-            { 
-                name: "V.I.P Suite", 
-                img: "https://pub-7c1beb3ad40844ff87d9eb2fad52b153.r2.dev/lc9.jpeg", 
-                status: "RESTRICTED", 
-                desc: "오직 허가된 최상위 회원만 접근 가능한 스위트룸. <span class='redacted'>감시 카메라가 존재하지 않는 유일한 곳</span>입니다.",
-                specs: { temp: "25.0°C", sound: "100% (Abs)", security: "Lv.MAX", capacity: "Private" }
             }
         ];
 
-        // ★ 캐릭터별 대사 추가 (personality) ★
         const characters = [
             { 
                 id: 1, 
@@ -1122,7 +1132,7 @@
             }, speed);
         }
 
-        // ★ 시설 모달 상호작용 기능 추가 ★
+        // 시설 모달 상호작용
         function performRoomAction(type, roomName) {
             const statusDisplay = document.getElementById('action-status-display');
             const btn = event.target;
@@ -1337,10 +1347,15 @@
                     trans.style.display = 'none';
                     const main = document.getElementById('main-content');
                     main.style.display = 'block';
+                    
+                    // 파티클 시작
+                    initParticles();
+
                     setTimeout(() => {
                         main.style.opacity = 1;
                         addLog(`User [${currentUser}] connected.`);
                         addLog("Biometric data synced.");
+                        addLog("Status: UNVERIFIED (U)");
                         attachRedactedEvent();
                         startEventLoop(); // 랜덤 이벤트 시작
                     }, 100);
@@ -1348,16 +1363,13 @@
             }, 3000);
         }
 
-        // --- 랜덤 이벤트 로직 (업데이트: 빈도 조절 & 캐릭터별 대사) ---
+        // --- 랜덤 이벤트 로직 ---
         function triggerRandomEvent() {
             if(document.getElementById('stage-intro').style.display !== 'none') return;
             if(document.getElementById('modal-overlay').style.display === 'flex') return;
             if(document.getElementById('alert-overlay').style.display === 'flex') return;
 
-            // 랜덤 캐릭터 선택
             const randomChar = characters[Math.floor(Math.random() * characters.length)];
-            
-            // 해당 캐릭터의 전용 대사 중 랜덤 선택
             const msgList = randomChar.private_msgs;
             const randomMsg = msgList[Math.floor(Math.random() * msgList.length)];
 
@@ -1378,7 +1390,6 @@
 
         let eventTimer;
         function startEventLoop() {
-            // 60초 ~ 120초 (1분~2분) 사이 랜덤
             const randomTime = (Math.random() * 60000) + 60000; 
             eventTimer = setTimeout(() => {
                 triggerRandomEvent();
@@ -1400,7 +1411,6 @@
             const time = new Date().toTimeString().split(' ')[0];
             line.innerText = `[${time}] ${msg}`;
             logBox.appendChild(line);
-            // 로그가 너무 쌓이면 삭제
             if(logBox.children.length > 6) {
                 logBox.removeChild(logBox.firstChild);
             }
@@ -1418,11 +1428,7 @@
             });
         }
 
-        // ================= CONTRACT LOGIC (NEW) ================= //
-        
-        // ★★★ 여기에 이동할 스토리 페이지 주소를 적으세요 ★★★
-        const TARGET_STORY_URL = "https://share.crack.wrtn.ai/dyj4k5"; 
-
+        // ================= CONTRACT LOGIC ================= //
         function toggleSubmitBtn() {
             const checkbox = document.getElementById('contract-check');
             const btn = document.getElementById('btn-enter-story');
@@ -1444,7 +1450,7 @@
             
             btn.disabled = true;
             btn.style.borderColor = "#fff";
-            btn.style.backgroundColor = "#b38b48"; // var(--gold)
+            btn.style.backgroundColor = "#b38b48"; 
             btn.style.color = "#000";
             btnText.innerText = "ACCESS GRANTED";
             
@@ -1458,6 +1464,90 @@
             setTimeout(() => {
                 window.location.href = TARGET_STORY_URL;
             }, 2000);
+        }
+
+        // ================= GOLD DUST PARTICLE SYSTEM ================= //
+        function initParticles() {
+            const canvas = document.getElementById('gold-dust');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                    // 처음 시작할 때 화면 전체에 퍼져있게 하려면 아래 주석 해제
+                    // this.y = Math.random() * height * 0.6; 
+                }
+
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = -10; // 화면 위에서 시작
+                    this.size = Math.random() * 2 + 0.5; // 크기
+                    this.speedY = Math.random() * 0.5 + 0.2; // 떨어지는 속도
+                    this.speedX = (Math.random() - 0.5) * 0.2; // 좌우 살짝 흔들림
+                    this.opacity = Math.random() * 0.5 + 0.3;
+                    this.fadeStart = height * 0.4; // 사라지기 시작하는 높이
+                    this.maxLife = height * 0.6; // 완전히 사라지는 높이 (중간쯤)
+                }
+
+                update() {
+                    this.y += this.speedY;
+                    this.x += this.speedX;
+
+                    // 반짝임 효과
+                    if (Math.random() > 0.95) {
+                        this.opacity = Math.random() * 0.8 + 0.2;
+                    }
+
+                    // 아래로 갈수록 투명해짐 (중간 지점부터)
+                    if (this.y > this.fadeStart) {
+                        const remaining = this.maxLife - this.y;
+                        const range = this.maxLife - this.fadeStart;
+                        this.opacity = (remaining / range) * 0.5;
+                    }
+
+                    // 화면 중간 넘어가거나 투명해지면 리셋
+                    if (this.y > this.maxLife || this.opacity <= 0) {
+                        this.reset();
+                    }
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(179, 139, 72, ${this.opacity})`; // Gold Color
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = "rgba(230, 200, 139, 0.5)";
+                    ctx.fill();
+                }
+            }
+
+            // 파티클 개수
+            const particleCount = 100;
+            for (let i = 0; i < particleCount; i++) {
+                const p = new Particle();
+                // 초기에 화면 상단부에 랜덤 배치해서 자연스럽게 보이게 함
+                p.y = Math.random() * height * 0.5;
+                particles.push(p);
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
         }
     </script>
 </body>
